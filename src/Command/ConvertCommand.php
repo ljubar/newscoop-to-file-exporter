@@ -48,7 +48,11 @@ class ConvertCommand extends ContainerAwareCommand
             } catch (\GuzzleHttp\Exception\ServerException $e) {
                 $output->writeln(printf('Error on fetching article. Error message: %s', $e->getMessage()));
                 continue;
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $output->writeln(printf('Error on fetching article. Error message: %s', $e->getMessage()));
+                continue;
             }
+
             /** @var Article $article */
             $article = $serializer->deserialize($response->getBody(), Article::class, 'json');
             $article->setBody($this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody()));
