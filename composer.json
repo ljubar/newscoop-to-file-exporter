@@ -8,11 +8,12 @@
         "symfony/console": "^3.3",
         "symfony/framework-bundle": "^3.3",
         "symfony/profiler-pack": "^1.0",
-        "symfony/yaml": "^3.3"
-    },
-    "require-dev": {
+        "symfony/yaml": "^3.3",
         "symfony/flex": "^1.0",
         "symfony/dotenv": "^3.3"
+    },
+    "require-dev": {
+        "deployer/deployer": "^6.0"
     },
     "config": {
         "preferred-install": {
