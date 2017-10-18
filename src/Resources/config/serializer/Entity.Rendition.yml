@@ -1,0 +1,12 @@
+App\Entity\Rendition:
+    exclusion_policy: ALL
+    properties:
+        caption:
+            expose: true
+            type: string
+        link:
+            expose: true
+            type: string
+        details:
+            expose: true
+            type: array

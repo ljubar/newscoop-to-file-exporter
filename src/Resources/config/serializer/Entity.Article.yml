@@ -1,0 +1,55 @@
+App\Entity\Article:
+    exclusion_policy: ALL
+    properties:
+        title:
+            expose: true
+            type: string
+            serialized_name: title
+        body:
+            expose: true
+            type: string
+        fields:
+            expose: true
+            type: array
+            serialized_name: fields
+            access_type: public_method
+        headline:
+            expose: true
+            type: string
+            serialized_name: headline
+        number:
+            expose: true
+            type: integer
+        language:
+            expose: true
+            type: string
+        createdAt:
+            expose: true
+            serialized_name: created
+            type: DateTime
+        publishedAt:
+            expose: true
+            type: DateTime
+            serialized_name: published
+        authors:
+            expose: true
+            access_type: public_method
+            type: array
+        keywords:
+            expose: true
+            type: string
+        webcode:
+            expose: true
+            type: string
+        url:
+            expose: url
+            type: string
+        renditions:
+            expose: true
+            type: array<App\Entity\Rendition>
+        issue:
+            expose: true
+            type: array
+        section:
+            expose: true
+            type: array

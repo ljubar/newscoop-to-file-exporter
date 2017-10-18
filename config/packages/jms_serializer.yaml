@@ -1,0 +1,10 @@
+jms_serializer:
+    handlers:
+        datetime:
+            default_format: "Y-m-d\\TH:i:sP" # ATOM
+    metadata:
+        auto_detection: false
+        directories:
+            app:
+                namespace_prefix: "App"
+                path: '%kernel.project_dir%/src/Resources/config/serializer'
