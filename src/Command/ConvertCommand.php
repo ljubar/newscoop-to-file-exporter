@@ -45,6 +45,7 @@ class ConvertCommand extends ContainerAwareCommand
             try {
                 $output->writeln('Fetching article '.$number);
                 $response = $client->request('GET', $domain.'/api/articles/'.$number);
+                $content = $response->getBody();
             } catch (\GuzzleHttp\Exception\ServerException $e) {
                 $output->writeln(printf('Error on fetching article. Error message: %s', $e->getMessage()));
                 continue;
@@ -53,8 +54,13 @@ class ConvertCommand extends ContainerAwareCommand
                 continue;
             }
 
+            if (!$this->isJson($content)) {
+                $output->writeln('Content is not valid JSON string');
+                continue;
+            }
+
             /** @var Article $article */
-            $article = $serializer->deserialize($response->getBody(), Article::class, 'json');
+            $article = $serializer->deserialize($content, Article::class, 'json');
             $article->setBody($this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody()));
 
             $output->writeln('Rendering article '.$number);
@@ -64,6 +70,13 @@ class ConvertCommand extends ContainerAwareCommand
 
             $this->saveContentToFile($domain, $article, $content);
         }
+    }
+
+    protected function isJson($string)
+    {
+        json_decode($string);
+
+        return json_last_error() == JSON_ERROR_NONE;
     }
 
     /**

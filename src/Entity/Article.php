@@ -178,6 +178,10 @@ class Article
             $this->setBody($fields['full_text']);
         }
 
+        if (array_key_exists('text', $fields)) {
+            $this->setBody($fields['text']);
+        }
+
         $this->fields = $fields;
     }
 
