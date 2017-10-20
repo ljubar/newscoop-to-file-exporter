@@ -15,4 +15,4 @@ Options:
 
 example:
 
-```newscoop:import-and-save-to-html 'http://24wspolnota.pl' 26527 26527 --force-image-download --print-rendered-template```
+```php bin/console newscoop:import-and-save-to-html 'http://24wspolnota.pl' 26527 26527 --force-image-download --print-rendered-template```
