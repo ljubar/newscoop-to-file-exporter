@@ -66,7 +66,9 @@ class ConvertCommand extends ContainerAwareCommand
 
             /** @var Article $article */
             $article = $serializer->deserialize($content, Article::class, 'json');
-            $article->setBody($this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody()));
+            $text = $this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody());
+            $text = $this->fetchAndReplaceBodyImages($text, $client, $domain, $forceImageDownload, $output);
+            $article->setBody($text);
             $this->processRenditions($client, $domain, $article, $forceImageDownload, $output);
 
             $output->writeln('Rendering article '.$number);
@@ -80,7 +82,12 @@ class ConvertCommand extends ContainerAwareCommand
         }
     }
 
-    protected function isJson($string)
+    /**
+     * @param string $string
+     *
+     * @return bool
+     */
+    protected function isJson(string $string): bool
     {
         json_decode($string);
 
@@ -148,13 +155,63 @@ class ConvertCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $domain
-     * @param $text
+     * @param string $domain
+     * @param string $text
      *
-     * @return mixed
+     * @return string
      */
-    private function replaceRelativeUrlsWithAbsolute($domain, $text)
+    private function replaceRelativeUrlsWithAbsolute(string $domain, string $text): string
     {
         return preg_replace("/(href|src)\=\"([^(http)])(\/)?/", "$1=\"$domain$2", $text);
+    }
+
+    /**
+     * @param string          $text
+     * @param Client          $client
+     * @param string          $domain
+     * @param bool            $forceImageDownload
+     * @param OutputInterface $output
+     *
+     * @return string
+     */
+    private function fetchAndReplaceBodyImages(string $text, Client $client, string $domain, bool $forceImageDownload, OutputInterface $output): string
+    {
+        libxml_use_internal_errors(true);
+        $dom = new \DOMdocument();
+
+        /*** load the html into the object ***/
+        $dom->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        /*** discard white space ***/
+        $dom->preserveWhiteSpace = false;
+        $images = $dom->getElementsByTagName('img');
+
+        $filesystem = new Filesystem();
+        $downloadedImages = [];
+        foreach ($images as $img) {
+            $originalImageUrl = $img->getAttribute('src');
+            $parts = parse_url($originalImageUrl);
+            parse_str($parts['query'], $query);
+            $imageId = $query['ImageId'];
+
+            $fileName = $imageId.'.jpg';
+            $filePath = str_replace('https://', '', str_replace('http://', '', $domain)).'/images';
+            $path = __DIR__.'/../../public/articles/'.$filePath;
+            $filesystem->mkdir($path);
+            if ((!file_exists($path.'/'.$fileName) || $forceImageDownload) && !in_array($originalImageUrl, $downloadedImages)) {
+                try {
+                    $response = $client->get($originalImageUrl);
+                } catch (ServerException | ClientException $e) {
+                    $output->writeln(printf('Error on fetching image. Error message: %s', $e->getMessage()));
+                    continue;
+                }
+
+                $downloadedImages[] = $originalImageUrl;
+                $output->writeln(sprintf('Downloading image from path: %s', $originalImageUrl));
+                file_put_contents($path.'/'.$fileName, $response->getBody());
+            }
+            $img->setAttribute('src', '/'.$filePath.'/'.$fileName);
+        }
+
+        return $dom->saveHTML();
     }
 }
