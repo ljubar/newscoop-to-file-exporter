@@ -180,7 +180,7 @@ class ConvertCommand extends ContainerAwareCommand
         $dom = new \DOMdocument();
 
         /*** load the html into the object ***/
-        $dom->loadHTML($text, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML(mb_convert_encoding($text, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         /*** discard white space ***/
         $dom->preserveWhiteSpace = false;
         $images = $dom->getElementsByTagName('img');
@@ -212,6 +212,6 @@ class ConvertCommand extends ContainerAwareCommand
             $img->setAttribute('src', '/'.$filePath.'/'.$fileName);
         }
 
-        return $dom->saveHTML();
+        return $dom->saveHTML($dom->documentElement);
     }
 }
