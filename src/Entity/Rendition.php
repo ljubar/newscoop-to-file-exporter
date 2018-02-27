@@ -7,14 +7,29 @@ namespace App\Entity;
  */
 class Rendition
 {
+    /**
+     * @var int
+     */
     protected $id;
 
+    /**
+     * @var string
+     */
     protected $caption;
 
+    /**
+     * @var string
+     */
     protected $link;
 
+    /**
+     * @var ArticleInterface
+     */
     protected $article;
 
+    /**
+     * @var array
+     */
     protected $details;
 
     /**

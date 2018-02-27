@@ -6,4 +6,5 @@
 /vendor/
 ###< symfony/framework-bundle ###
 /public/articles/
+/public/ninjs/
 deploy.php

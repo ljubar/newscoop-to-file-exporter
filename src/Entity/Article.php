@@ -5,37 +5,87 @@ namespace App\Entity;
 /**
  * Class Article.
  */
-class Article
+class Article implements ArticleInterface
 {
+    /**
+     * @var int
+     */
     protected $id;
 
+    /**
+     * @var int
+     */
     protected $number;
 
+    /**
+     * @var \DateTime
+     */
     protected $createdAt;
 
+    /**
+     * @var \DateTime
+     */
     protected $publishedAt;
 
+    /**
+     * @var array
+     */
     protected $authors;
 
+    /**
+     * @var array
+     */
     protected $keywords;
 
+    /**
+     * @var string
+     */
     protected $title;
 
+    /**
+     * @var string
+     */
     protected $webcode;
 
+    /**
+     * @var array
+     */
     protected $fields;
 
+    /**
+     * @var string
+     */
     protected $url;
 
+    /**
+     * @var array
+     */
     protected $renditions;
 
+    /**
+     * @var string
+     */
     protected $language;
 
+    /**
+     * @var string
+     */
     protected $issue;
 
+    /**
+     * @var string
+     */
     protected $section;
 
+    /**
+     * @var string
+     */
     protected $body;
+
+    /**
+     * @var string
+     */
+    protected $type;
 
     /**
      * @return mixed
@@ -226,17 +276,19 @@ class Article
     }
 
     /**
-     * @param $caption
+     * @param string $caption
      *
-     * @return mixed
+     * @return Rendition|null
      */
-    public function getRendition($caption)
+    public function getRendition(string $caption): ?Rendition
     {
         foreach ($this->getRenditions() as $rendition) {
             if ($rendition->getCaption() === $caption) {
                 return $rendition;
             }
         }
+
+        return null;
     }
 
     /**
@@ -292,6 +344,10 @@ class Article
      */
     public function getBody()
     {
+        if (null === $this->body) {
+            return '';
+        }
+
         return $this->body;
     }
 
@@ -301,5 +357,21 @@ class Article
     public function setBody($body)
     {
         $this->body = $body;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
     }
 }

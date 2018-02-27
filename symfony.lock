@@ -1,0 +1,68 @@
+{
+    "ahs/ninjs-php": {
+        "version": "dev-master"
+    },
+    "behat/transliterator": {
+        "version": "v1.2.0"
+    },
+    "doctrine/cache": {
+        "version": "v1.7.1"
+    },
+    "doctrine/collections": {
+        "version": "v1.5.0"
+    },
+    "doctrine/common": {
+        "version": "v2.8.1"
+    },
+    "doctrine/inflector": {
+        "version": "v1.3.0"
+    },
+    "hoa/consistency": {
+        "version": "1.17.05.02"
+    },
+    "hoa/event": {
+        "version": "1.17.01.13"
+    },
+    "hoa/exception": {
+        "version": "1.17.01.16"
+    },
+    "hoa/mime": {
+        "version": "3.17.01.10"
+    },
+    "hoa/protocol": {
+        "version": "1.17.01.14"
+    },
+    "hoa/stream": {
+        "version": "1.17.02.21"
+    },
+    "hoa/zformat": {
+        "version": "1.17.01.10"
+    },
+    "justinrainbow/json-schema": {
+        "version": "2.0.5"
+    },
+    "paragonie/random_compat": {
+        "version": "v2.0.11"
+    },
+    "swp/bridge": {
+        "version": "v1.2.0"
+    },
+    "swp/common": {
+        "version": "v0.5.0"
+    },
+    "swp/storage": {
+        "version": "v0.5.0"
+    },
+    "symfony/inflector": {
+        "version": "v4.0.4"
+    },
+    "symfony/polyfill-php70": {
+        "version": "v1.7.0"
+    },
+    "symfony/property-access": {
+        "version": "v3.4.4"
+    },
+    "symfony/serializer": {
+        "version": "v3.4.4"
+    }
+}

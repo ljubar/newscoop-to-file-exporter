@@ -8,3 +8,7 @@ jms_serializer:
             app:
                 namespace_prefix: "App"
                 path: '%kernel.project_dir%/src/Resources/config/serializer'
+    visitors:
+        json:
+            options: JSON_PRETTY_PRINT
+

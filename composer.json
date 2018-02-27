@@ -3,14 +3,18 @@
     "license": "proprietary",
     "require": {
         "php": "^7.1.0",
+        "ahs/ninjs-php": "dev-master",
+        "swp/bridge": "dev-master",
+        "behat/transliterator": "^1.2",
         "guzzlehttp/guzzle": "^6.3",
+        "hoa/mime": "3.17.01.10",
         "jms/serializer-bundle": "^2.2",
         "symfony/console": "^3.3",
+        "symfony/dotenv": "^3.3",
+        "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^3.3",
         "symfony/profiler-pack": "^1.0",
-        "symfony/yaml": "^3.3",
-        "symfony/flex": "^1.0",
-        "symfony/dotenv": "^3.3"
+        "symfony/yaml": "^3.3"
     },
     "require-dev": {
         "deployer/deployer": "^6.0"
@@ -21,6 +25,12 @@
         },
         "sort-packages": true
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../ninjs-php"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "App\\": "src/"
