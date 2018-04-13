@@ -9,9 +9,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-/*
- * Class ConvertCommand
- */
 use App\Entity\Article;
 use App\Importer\NewscoopApiImporter;
 use App\Publisher\NinjsJsonPublisher;

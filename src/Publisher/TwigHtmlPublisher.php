@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace App\Publisher;
 
 use App\Entity\Article;
+use App\Entity\ArticleInterface;
+use App\Entity\ContentInterface;
 use Psr\Log\LogLevel;
 use Twig\Environment;
 
@@ -47,10 +49,13 @@ class TwigHtmlPublisher extends AbstractPublisher implements PublisherInterface
     /**
      * {@inheritdoc}
      */
-    public function publish(Article $article, $printRenderedTemplate = false): void
+    public function publish(ContentInterface $article, $printRenderedTemplate = false): void
     {
-        $this->log(LogLevel::INFO, 'Rendering article '.$article->getNumber());
-        $content = $this->twig->render('article.html.twig', ['article' => $article]);
+        if (!$article instanceof ArticleInterface) {
+            return;
+        }
+        $this->log(LogLevel::INFO, 'Rendering article '.$article->getIdentifier());
+        $content = $this->twig->render('article.html.twig', ['article' => $content]);
 
         if ($printRenderedTemplate) {
             $this->log(LogLevel::INFO, $content);

@@ -27,5 +27,5 @@ interface ImporterInterface
      *
      * @return Article
      */
-    public function import(string $domain, int $articleNumber, bool $forceImageDownload = false): Article;
+    public function import(string $domain, int $articleNumber, bool $forceImageDownload = false);
 }

@@ -18,7 +18,6 @@ namespace App\Serializer;
 
 use AHS\Ninjs\Serializer\Normalizer\IgnoreNullValuesNormalizer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Serializer\SerializerInterface as NinjsSerializerInterface;

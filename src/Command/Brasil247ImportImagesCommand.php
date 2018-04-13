@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Article;
-use App\Factory\Brasil247NinjsFactory;
+use App\Factory\NinjsFactory;
 use App\Importer\ImporterInterface;
-use App\Importer\NewscoopApiImporter;
+use App\Importer\NewscoopImageApiImporter;
 use App\Publisher\NinjsJsonPublisher;
 use App\Publisher\PublisherInterface;
 use GuzzleHttp\Client;
@@ -28,9 +28,9 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class Brasil247ImportCommand.
+ * Class Brasil247ImportImagesCommand.
  */
-class Brasil247ImportCommand extends ContainerAwareCommand
+class Brasil247ImportImagesCommand extends ContainerAwareCommand
 {
     /**
      * @var ImporterInterface
@@ -48,11 +48,11 @@ class Brasil247ImportCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('newscoop:import-brasil247')
-            ->setDescription('Imports newscoop articles from brasil247 and save it to json.')
-            ->setHelp('This command allows to import Newscoop articles with API usage and save them to predefined structure of html files')
+            ->setName('newscoop:import-brasil247:images')
+            ->setDescription('Imports newscoop images from brasil247 and save it to json (ninjs).')
+            ->setHelp('This command allows to import Newscoop images with API and save them to nonjs formated json files')
             ->addArgument('domain', InputArgument::REQUIRED, 'Newscoop instance domain to fetch data from it.')
-            ->addArgument('start', InputArgument::OPTIONAL, 'Number of article (start import from it).', null)
+            ->addArgument('start', InputArgument::OPTIONAL, 'Number of image (start import from it).', null)
             ->addOption('force-image-download', null, InputOption::VALUE_NONE, 'Re-download images even if they are already fetched')
             ->addOption('print-output', null, InputOption::VALUE_NONE, 'Prints result of publishing')
             ->addOption('single-fetch', '-s', InputOption::VALUE_OPTIONAL, 'Article number to fetch');
@@ -73,20 +73,20 @@ class Brasil247ImportCommand extends ContainerAwareCommand
         $producer = $this->getContainer()->get('old_sound_rabbit_mq.newscoop_import_producer');
 
         if (null === $input->getOption('single-fetch')) {
-            $this->processArticles(
+            $this->processImages(
                 $producer,
                 $logger,
                 $client,
-                $input->getArgument('domain').'/api/articles?items_per_page=600&fields=number&language=pt&sort[created]=desc',
+                $input->getArgument('domain').'/api/images?items_per_page=600&sort[created]=desc',
                 $input->getArgument('domain'),
                 $start
             );
         } else {
-            $this->processArticle(
+            $this->processImage(
                 $producer,
                 $logger,
                 $client,
-                $input->getArgument('domain').'/api/articles/'.$input->getOption('single-fetch'),
+                $input->getArgument('domain').'/api/images/'.$input->getOption('single-fetch'),
                 $input->getArgument('domain')
             );
         }
@@ -99,18 +99,18 @@ class Brasil247ImportCommand extends ContainerAwareCommand
      * @param string            $url
      * @param string            $domain
      */
-    protected function processArticle(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain): void
+    protected function processImage(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain): void
     {
-        $article = $this->getArticles($logger, $client, $url);
+        $image = $this->getData($logger, $client, $url);
 
         try {
             $producer->publish(json_encode([
                 'domain' => $domain,
-                'contentId' => $article['number'],
+                'contentId' => $image['id'],
                 'forceImageDownload' => true,
-                'importerClass' => NewscoopApiImporter::class,
+                'importerClass' => NewscoopImageApiImporter::class,
                 'publisherClass' => NinjsJsonPublisher::class,
-                'publisherFactoryClass' => Brasil247NinjsFactory::class,
+                'publisherFactoryClass' => NinjsFactory::class,
             ]));
         } catch (\Exception $e) {
             $logger->log(LogLevel::ERROR, $e->getMessage());
@@ -125,32 +125,32 @@ class Brasil247ImportCommand extends ContainerAwareCommand
      * @param string            $domain
      * @param int|null          $start
      */
-    protected function processArticles(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain, int $start = null): void
+    protected function processImages(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain, int $start = null): void
     {
-        $articles = $this->getArticles($logger, $client, $url);
-        $processedArticles = 0;
-        foreach ($articles['items'] as $article) {
-            if (null !== $start && $article['number'] > $start) {
+        $images = $this->getData($logger, $client, $url);
+        $processedImages = 0;
+        foreach ($images['items'] as $image) {
+            if (null !== $start && $image['id'] > $start) {
                 continue;
             }
             try {
                 $producer->publish(json_encode([
                     'domain' => $domain,
-                    'contentId' => $article['number'],
+                    'contentId' => $image['id'],
                     'forceImageDownload' => true,
-                    'importerClass' => NewscoopApiImporter::class,
+                    'importerClass' => NewscoopImageApiImporter::class,
                     'publisherClass' => NinjsJsonPublisher::class,
-                    'publisherFactoryClass' => Brasil247NinjsFactory::class,
+                    'publisherFactoryClass' => NinjsFactory::class,
                 ]));
-                ++$processedArticles;
+                ++$processedImages;
             } catch (\Exception $e) {
                 $logger->log(LogLevel::ERROR, $e->getMessage());
             }
         }
-        $logger->log(LogLevel::INFO, 'Processed '.$processedArticles.' articles');
+        $logger->log(LogLevel::INFO, 'Processed '.$processedImages.' images');
 
-        if (isset($articles['pagination']['nextPageLink'])) {
-            $this->processArticles($producer, $logger, $client, $articles['pagination']['nextPageLink'], $domain);
+        if (isset($images['pagination']['nextPageLink'])) {
+            $this->processImages($producer, $logger, $client, $images['pagination']['nextPageLink'], $domain);
         }
     }
 
@@ -161,15 +161,15 @@ class Brasil247ImportCommand extends ContainerAwareCommand
      *
      * @return array|null
      */
-    protected function getArticles(ConsoleLogger $logger, Client $client, string $url): ?array
+    protected function getData(ConsoleLogger $logger, Client $client, string $url): ?array
     {
-        $logger->log(LogLevel::INFO, 'Fetching articles from url: '.$url);
-        $articlesResponse = $client->request('GET', $url, [
+        $logger->log(LogLevel::INFO, 'Fetching images from url: '.$url);
+        $response = $client->request('GET', $url, [
             'on_stats' => function (TransferStats $stats) use ($logger) {
                 $logger->log(LogLevel::INFO, 'request time: '.$stats->getTransferTime());
             },
         ]);
 
-        return json_decode($articlesResponse->getBody()->getContents(), true);
+        return json_decode($response->getBody()->getContents(), true);
     }
 }

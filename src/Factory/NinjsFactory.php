@@ -11,12 +11,16 @@ namespace App\Factory;
 
 use AHS\Ninjs\Schema\Associations;
 use AHS\Ninjs\Schema\Renditions;
+use AHS\Ninjs\Superdesk\Service;
 use App\Entity\ArticleInterface;
 use AHS\Ninjs\Superdesk\Author;
 use AHS\Ninjs\Superdesk\Item;
 use AHS\Ninjs\Superdesk\Rendition;
+use App\Entity\ContentInterface;
+use App\Entity\ImageInterface;
 use Behat\Transliterator\Transliterator;
 use Hoa\Mime\Mime;
+use App\Entity\Rendition as ArticleRendition;
 
 class NinjsFactory implements FactoryInterface
 {
@@ -68,6 +72,7 @@ class NinjsFactory implements FactoryInterface
         $item->setVersion('1');
         $item->setHeadline($article->getTitle());
         $item->setSlugline(Transliterator::urlize($article->getTitle()));
+        $item->setVersioncreated($article->getPublishedAt());
         $item->setUrgency(5);
         $item->setPriority(5);
         $item->setPubstatus('usable');
@@ -75,6 +80,7 @@ class NinjsFactory implements FactoryInterface
 
         $this->setAuthor($article, $item);
         $this->setCategory($article, $item);
+        $this->setExtra($article, $item);
 
         return $item;
     }
@@ -110,6 +116,12 @@ class NinjsFactory implements FactoryInterface
         $imageItem = new Item($externalUrl);
         $imageItem->setType('picture');
         $imageItem->setHeadline($article->getTitle());
+        $caption = $rendition->getDetails()['caption'];
+        if ('' === $caption) {
+            $caption = $this->getDescription($article);
+        }
+        $imageItem->setDescriptionHtml($caption);
+        $imageItem->setDescriptionText(strip_tags($caption));
         $imageItem->setVersion('1');
         $this->setAuthor($article, $imageItem);
         $imageItem->setUrgency(5);
@@ -117,9 +129,10 @@ class NinjsFactory implements FactoryInterface
         $imageItem->setLanguage($article->getLanguage());
         $imageItem->setUsageterms('indefinite-usage');
         $imageItem->setPubstatus('usable');
+        $imageItem->setVersioncreated($article->getPublishedAt());
 
         $renditions = new Renditions();
-        $originalRendition = new Rendition('http://'.$externalUrl);
+        $originalRendition = new Rendition($externalUrl);
         $originalRendition->setMimetype(Mime::getMimeFromExtension($extension));
         $originalRendition->setWidth($width);
         $originalRendition->setHeight($height);
@@ -131,8 +144,46 @@ class NinjsFactory implements FactoryInterface
         return $imageItem;
     }
 
+    public function createImageItem(ImageInterface $image)
+    {
+        $imageItem = new Item($image->getDomain().'/images/'.$image->getBasename());
+        $extension = pathinfo($imageItem->getGuid(), PATHINFO_EXTENSION);
+        $mimeType = Mime::getMimeFromExtension($extension);
+        $imageItem->setType('picture');
+        $imageItem->setHeadline($image->getDescription() ? strip_tags($image->getDescription()) : 'Image #'.$image->getId());
+        $imageItem->setDescriptionHtml($image->getDescription());
+        $imageItem->setDescriptionText(strip_tags($image->getDescription()));
+        $imageItem->setVersion('1');
+        if ($image->getPhotographer()) {
+            $author = new Author();
+            $author->setName($image->getPhotographer());
+            $author->setRole('photographer');
+            $imageItem->setByline($author->getName());
+            $imageItem->addAuthor($author);
+        }
+        $imageItem->setUrgency(5);
+        $imageItem->setPriority(5);
+        $imageItem->setLanguage('en');
+        $imageItem->setUsageterms('indefinite-usage');
+        $imageItem->setPubstatus('usable');
+        $imageItem->setMimeType($mimeType);
+        $imageItem->setVersioncreated(new \DateTime());
+
+        $renditions = new Renditions();
+        $originalRendition = new Rendition($imageItem->getGuid());
+        $originalRendition->setMimetype($mimeType);
+        $originalRendition->setWidth((int) $image->getWidth());
+        $originalRendition->setHeight((int) $image->getHeight());
+        $originalRendition->setMedia($image->getBasename());
+        $renditions->add('original', $originalRendition);
+        $renditions->add('baseImage', $originalRendition);
+        $imageItem->setRenditions($renditions);
+
+        return $imageItem;
+    }
+
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getRenditionNames(): array
     {
@@ -140,9 +191,7 @@ class NinjsFactory implements FactoryInterface
     }
 
     /**
-     * @param ArticleInterface $article
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDescription(ArticleInterface $article): string
     {
@@ -154,21 +203,48 @@ class NinjsFactory implements FactoryInterface
     }
 
     /**
-     * @param ArticleInterface $article
-     * @param Item             $item
+     * {@inheritdoc}
      */
-    protected function setCategory(ArticleInterface $article, Item $item)
+    public function setCategory(ArticleInterface $article, Item $item): void
     {
-        // Change it to service
-        $item->setLocated($article->getSection()['title']);
+        $issueName = $article->getIssue()['title'];
+        $sectionName = $article->getSection()['title'];
+
+        $item->addService(new Service($issueName, $sectionName));
     }
 
     /**
-     * @param ArticleInterface $article
-     * @param Item             $item
+     * {@inheritdoc}
      */
-    protected function setAuthor(ArticleInterface $article, Item $item)
+    public function setExtra(ArticleInterface $article, Item $item): void
     {
+        // not implemented by default
+        return;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSupported(ContentInterface $content): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param ArticleInterface      $article
+     * @param Item                  $item
+     * @param ArticleRendition|null $rendition
+     */
+    protected function setAuthor(ArticleInterface $article, Item $item, ArticleRendition $rendition = null)
+    {
+        if (null !== $rendition) {
+            $author = new Author();
+            $author->setName($rendition->getDetails()['photographer']);
+            $author->setRole('photographer');
+            $item->setByline($author->getName());
+            $item->addAuthor($author);
+        }
+
         $articleAuthors = $article->getAuthors();
 
         if (null === $articleAuthors) {
@@ -181,6 +257,7 @@ class NinjsFactory implements FactoryInterface
         foreach ($articleAuthors as $articleAuthor) {
             $author = new Author();
             $author->setName($articleAuthor['name']);
+            $author->setRole('editor');
             $byline[] = $articleAuthor['name'];
             $item->addAuthor($author);
         }

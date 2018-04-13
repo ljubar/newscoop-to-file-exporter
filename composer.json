@@ -4,15 +4,17 @@
     "require": {
         "php": "^7.1.0",
         "ahs/ninjs-php": "dev-master",
-        "swp/bridge": "dev-master",
         "behat/transliterator": "^1.2",
         "guzzlehttp/guzzle": "^6.3",
         "hoa/mime": "3.17.01.10",
         "jms/serializer-bundle": "^2.2",
+        "php-amqplib/rabbitmq-bundle": "^1.14",
+        "swp/bridge": "dev-master",
         "symfony/console": "^3.3",
         "symfony/dotenv": "^3.3",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^3.3",
+        "symfony/monolog-bundle": "^3.1",
         "symfony/profiler-pack": "^1.0",
         "symfony/yaml": "^3.3"
     },
@@ -61,7 +63,7 @@
     "extra": {
         "symfony": {
             "id": "01BWPZR8Y0SCV0RAZMQ1W10G1M",
-            "allow-contrib": false
+            "allow-contrib": true
         }
     }
 }

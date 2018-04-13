@@ -16,13 +16,13 @@ declare(strict_types=1);
 
 namespace App\Publisher;
 
-use App\Entity\Article;
+use App\Entity\ContentInterface;
 
 interface PublisherInterface
 {
     /**
-     * @param Article $article
-     * @param bool    $printRenderedTemplate
+     * @param ContentInterface $content
+     * @param bool             $printRenderedTemplate
      */
-    public function publish(Article $article, $printRenderedTemplate = false): void;
+    public function publish(ContentInterface $content, $printRenderedTemplate = false): void;
 }

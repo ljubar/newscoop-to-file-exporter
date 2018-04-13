@@ -1,0 +1,33 @@
+App\Entity\Image:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            type: int
+        location:
+            expose: true
+            type: string
+        basename:
+            expose: true
+            type: string
+        thumbnailPath:
+            expose: true
+            type: string
+        description:
+            expose: true
+            type: string
+        width:
+            expose: true
+            type: string
+        height:
+            expose: true
+            type: string
+        photographer:
+            expose: true
+            type: string
+        photographerUrl:
+            expose: true
+            type: string
+        place:
+            expose: true
+            type: string

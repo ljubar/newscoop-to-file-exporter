@@ -17,6 +17,12 @@ services:
             $client: '@GuzzleHttp\ClientInterface'
             $serializer: '@jms_serializer'
 
+    App\Importer\NewscoopImageApiImporter:
+        public: true
+        arguments:
+            $client: '@GuzzleHttp\ClientInterface'
+            $serializer: '@jms_serializer'
+
     App\Publisher\TwigHtmlPublisher:
         public: true
         arguments:
@@ -29,6 +35,7 @@ services:
             $projectDir: '%kernel.project_dir%'
 
     App\Factory\NinjsFactory:
+        public: true
         arguments:
             $publicDirPath: '%kernel.project_dir%/public'
 
@@ -37,10 +44,15 @@ services:
         arguments:
             $publicDirPath: '%kernel.project_dir%/public'
 
+    App\Consumer\NewscoopImportConsumer:
+        public: true
+        arguments:
+
+
 
     App\:
         resource: '../src/*'
-        exclude: '../src/{Entity,Migrations,Factory,Importer,Publisher}'
+        exclude: '../src/{Entity,Migrations,Factory,Importer,Publisher,Consumer}'
 
     App\Serializer\SerializerInterface: '@App\Serializer\NinjsSerializer'
     App\Factory\FactoryInterface: '@App\Factory\NinjsFactory'

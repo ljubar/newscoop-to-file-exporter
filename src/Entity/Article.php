@@ -5,7 +5,7 @@ namespace App\Entity;
 /**
  * Class Article.
  */
-class Article implements ArticleInterface
+class Article extends Content implements ArticleInterface
 {
     /**
      * @var int
@@ -101,6 +101,14 @@ class Article implements ArticleInterface
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return $this->getNumber();
     }
 
     /**
@@ -373,5 +381,21 @@ class Article implements ArticleInterface
     public function setType(string $type): void
     {
         $this->type = $type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOutputFileLocation(): string
+    {
+        return explode('/', $this->getUrl())[2];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOutputFileName(): string
+    {
+        return $this->getNumber().'.json';
     }
 }

@@ -11,6 +11,7 @@ namespace App\Factory;
 
 use App\Entity\ArticleInterface;
 use AHS\Ninjs\Superdesk\Item;
+use App\Entity\ContentInterface;
 
 interface FactoryInterface
 {
@@ -46,4 +47,23 @@ interface FactoryInterface
      * @return string
      */
     public function getDescription(ArticleInterface $article): string;
+
+    /**
+     * @param ArticleInterface $article
+     * @param Item             $item
+     */
+    public function setCategory(ArticleInterface $article, Item $item): void;
+
+    /**
+     * @param ArticleInterface $article
+     * @param Item             $item
+     */
+    public function setExtra(ArticleInterface $article, Item $item): void;
+
+    /**
+     * @param ContentInterface $content
+     *
+     * @return bool
+     */
+    public function isSupported(ContentInterface $content): bool;
 }

@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace App\Factory;
 
-use AHS\Ninjs\Item;
+use AHS\Ninjs\Superdesk\Extra;
 use AHS\Ninjs\Superdesk\Service;
 use App\Entity\ArticleInterface;
 use AHS\Ninjs\Superdesk\Item as SuperdeskItem;
+use App\Entity\ContentInterface;
 
 /**
  * Class Brasil247NinjsFactory.
@@ -20,70 +21,151 @@ use AHS\Ninjs\Superdesk\Item as SuperdeskItem;
 class Brasil247NinjsFactory extends NinjsFactory
 {
     const ISSUES = [
-        3 => 'Blogs',
-        5 => 'Colunistas',
-        6 => 'Destinos 247',
-        7 => 'Saude 247',
-        9 => 'Digiclub',
+        3 => [
+            'name' => 'Blog e Colunas',
+            'code' => 'blog',
+        ],
+        5 => [
+            'name' => 'Blog e Colunas',
+            'code' => 'blog',
+        ],
+        6 => [
+            'name' => 'Destinos 247',
+            'code' => 'dest',
+        ],
+        7 => [
+            'name' => 'Saude 247',
+            'code' => 'Sau',
+        ],
+        9 => [
+            'name' => 'Digiclub',
+            'code' => 'Dig',
+        ],
         10 => [
-            1 => 'Poder',
-            5 => 'Brasil',
-            10 => 'Colunistas',
-            20 => 'Mundo',
-            30 => 'Economia',
-            34 => 'Emprender',
-            35 => 'Seu Dinheiro',
-            45 => 'Últimas notícias',
-            70 => 'Cultura',
-            80 => 'Midia',
-            100 => 'Esporte',
-            101 => 'Esporte',
-            110 => 'Oásis', // pdf type to Revista Oasis
-            117 => 'Bahia 247',
-            118 => 'Alagoas 247',
-            120 => 'Brasilia 247',
-            123 => 'Ceara 247',
-            125 => 'Goias 247',
-            130 => 'SP 247',
-            135 => 'Minas 247',
-            137 => 'Parana 247',
-            138 => 'Piaui 247',
-            140 => 'Rio 247',
-            142 => 'Rio Grande do Sul 247',
-            143 => 'Tocantins 247',
-            148 => 'Sergipe 247',
-            149 => 'Maranhao 247',
-            150 => 'Pernambuco 247',
-            450 => 'Revista',
-            9999 => 'Apoio',
+            'sections' => [
+                1 => [
+                    'name' => 'Poder',
+                    'code' => 'Pod',
+                ],
+                5 => [
+                    'name' => 'Brasil',
+                    'code' => 'Pod',
+                ],
+                10 => [
+                    'name' => 'Blog e Colunas',
+                    'code' => 'blog',
+                ],
+                20 => [
+                    'name' => 'Mundo',
+                    'code' => 'M',
+                ],
+                30 => [
+                    'name' => 'Economia',
+                    'code' => 'Ec',
+                ],
+                34 => [
+                    'name' => 'Empreender',
+                    'code' => 'Emp',
+                ],
+                35 => [
+                    'name' => 'Seu Dinheiro',
+                    'code' => 'SeD',
+                ],
+                45 => [
+                    'name' => 'Últimas notícias',
+                    'code' => 'UN',
+                ],
+                70 => [
+                    'name' => 'Cultura',
+                    'code' => 'Cult',
+                ],
+                80 => [
+                    'name' => 'Midia',
+                    'code' => 'Mid',
+                ],
+                100 => [
+                    'name' => 'Esporte',
+                    'code' => 'esp',
+                ],
+                101 => [
+                    'name' => 'Esporte',
+                    'code' => 'esp',
+                ],
+                110 => [
+                    'name' => 'Oásis',
+                    'code' => 'O',
+                ],
+                117 => [
+                    'name' => 'Bahia 247',
+                    'code' => 'Bah247',
+                ],
+                118 => [
+                    'name' => 'Alagoas 247',
+                    'code' => 'Ala247',
+                ],
+                120 => [
+                    'name' => 'Brasilia 247',
+                    'code' => 'Bra247',
+                ],
+                123 => [
+                    'name' => 'Ceara 247',
+                    'code' => 'Cea247',
+                ],
+                125 => [
+                    'name' => 'Goias 247',
+                    'code' => 'Goi247',
+                ],
+                130 => [
+                    'name' => 'SP 247',
+                    'code' => 'SP247',
+                ],
+                135 => [
+                    'name' => 'Minas 247',
+                    'code' => 'Min247',
+                ],
+                137 => [
+                    'name' => 'Parana 247',
+                    'code' => 'Par247',
+                ],
+                138 => [
+                    'name' => 'Piaui 247',
+                    'code' => 'Pia247',
+                ],
+                140 => [
+                    'name' => 'Rio 247',
+                    'code' => 'Rio247',
+                ],
+                142 => [
+                    'name' => 'Rio Grande do Sul 247',
+                    'code' => 'RGS247',
+                ],
+                143 => [
+                    'name' => 'Tocantins 247',
+                    'code' => 'Toc247',
+                ],
+                148 => [
+                    'name' => 'Sergipe 247',
+                    'code' => 'Ser247',
+                ],
+                149 => [
+                    'name' => 'Maranhao 247',
+                    'code' => 'Mar247',
+                ],
+                150 => [
+                    'name' => 'Pernambuco 247',
+                    'code' => 'Per247',
+                ],
+                450 => [
+                    'name' => 'Revista',
+                    'code' => 'rev',
+                ],
+                9999 => [
+                    'name' => 'Apoio',
+                    'code' => 'Apo',
+                ],
+            ],
         ],
     ];
-
-    /**
-     * @param ArticleInterface $article
-     * @param Item             $item
-     */
-    protected function setCategory(ArticleInterface $article, SuperdeskItem $item)
-    {
-        $issueNumber = $article->getIssue()['number'];
-        $sectionNumber = $article->getSection()['number'];
-
-        if (array_key_exists($issueNumber, self::ISSUES)) {
-            if (is_string(self::ISSUES[$issueNumber])) {
-                $category = self::ISSUES[$issueNumber];
-                $code = $issueNumber;
-            } elseif (is_array(self::ISSUES[$issueNumber])) {
-                $category = self::ISSUES[$issueNumber][$sectionNumber];
-                $code = $issueNumber.'_'.$sectionNumber;
-            }
-        }
-
-        if (!isset($category)) {
-            return;
-        }
-
-        $item->addService(new Service($category, (string) $code));
-    }
 
     /**
      * @return array
@@ -108,5 +190,69 @@ class Brasil247NinjsFactory extends NinjsFactory
         }
 
         return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtra(ArticleInterface $article, SuperdeskItem $item): void
+    {
+        if ('revista' === $article->getType()) {
+            $extra = new Extra();
+            $extra->add('pdf', $article->getFields()['link_to_pdf']);
+            $item->setExtra($extra);
+
+            return;
+        }
+    }
+
+    /**
+     * @param ArticleInterface $article
+     * @param SuperdeskItem    $item
+     *
+     * @throws \Exception
+     */
+    public function setCategory(ArticleInterface $article, SuperdeskItem $item): void
+    {
+        if ('revista' === $article->getType()) {
+            $item->addService(new Service('Revista Oasis', 'revO'));
+
+            return;
+        }
+
+        $issueNumber = $article->getIssue()['number'];
+        $sectionNumber = $article->getSection()['number'];
+
+        if (array_key_exists($issueNumber, self::ISSUES)) {
+            if (isset(self::ISSUES[$issueNumber]['name'])) {
+                $category = self::ISSUES[$issueNumber]['name'];
+                $code = self::ISSUES[$issueNumber]['code'];
+            } elseif (isset(self::ISSUES[$issueNumber]['sections'][$sectionNumber]['name'])) {
+                $category = self::ISSUES[$issueNumber]['sections'][$sectionNumber]['name'];
+                $code = self::ISSUES[$issueNumber]['sections'][$sectionNumber]['code'];
+            }
+        }
+
+        if (!isset($category)) {
+            throw new \Exception(sprintf('no category for issue: %s and section: %s', $issueNumber, $sectionNumber));
+        }
+
+        $item->addService(new Service($category, (string) $code));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isSupported(ContentInterface $content): bool
+    {
+        if (!$content instanceof ArticleInterface) {
+            return false;
+        }
+
+        if ('newswire' === $content->getType()) {
+            return false;
+        }
+
+        return true;
     }
 }

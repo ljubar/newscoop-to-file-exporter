@@ -17,6 +17,9 @@ declare(strict_types=1);
 namespace App\Publisher;
 
 use App\Entity\Article;
+use App\Entity\ArticleInterface;
+use App\Entity\ContentInterface;
+use App\Entity\ImageInterface;
 use App\Factory\FactoryInterface;
 use App\Factory\NinjsFactory;
 use App\Serializer\SerializerInterface;
@@ -57,13 +60,23 @@ class NinjsJsonPublisher extends AbstractPublisher implements PublisherInterface
     /**
      * {@inheritdoc}
      */
-    public function publish(Article $article, $printRenderedTemplate = false): void
+    public function publish(ContentInterface $content, $printRenderedTemplate = false): void
     {
-        $this->log(LogLevel::INFO, 'Creating NINJS for article with number: '.$article->getNumber());
+        if (!$this->ninjsFactory->isSupported($content)) {
+            return;
+        }
 
-        $item = $this->ninjsFactory->create($article);
+        $this->log(LogLevel::INFO, 'Creating NINJS for article with number: '.$content->getIdentifier());
+
+        if ($content instanceof ArticleInterface) {
+            $item = $this->ninjsFactory->create($content);
+        } elseif ($content instanceof ImageInterface) {
+            $item = $this->ninjsFactory->createImageItem($content);
+        } else {
+            return;
+        }
+
         $ninJs = $this->serializer->serialize($item, 'json', ['json_encode_options' => JSON_PRETTY_PRINT]);
-
         $validator = new NinjsValidator($this->logger);
         if (!$validator->isValid($ninJs)) {
             throw new \Exception('Generated ninjs is not valid');
@@ -75,9 +88,9 @@ class NinjsJsonPublisher extends AbstractPublisher implements PublisherInterface
             $this->log(LogLevel::INFO, $ninJs);
         }
 
-        $domain = explode('/', $article->getUrl())[2];
-        $fileName = $article->getNumber().'.json';
-        $path = $this->projectDir.'/public/ninjs/'.$domain;
+        $fileLocation = $content->getOutputFileLocation();
+        $fileName = date('hi').'__'.$content->getOutputFileName();
+        $path = $this->projectDir.'/public/ninjs/'.$fileLocation;
 
         $this->saveContentToFile($fileName, $path, $ninJs);
     }

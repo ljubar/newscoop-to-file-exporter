@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Importer;
 
 use App\Entity\Article;
+use App\Entity\Image;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -24,7 +25,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use JMS\Serializer\SerializerInterface;
 use Psr\Log\LogLevel;
 
-class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
+class NewscoopImageApiImporter extends AbstractImporter implements ImporterInterface
 {
     /**
      * @var SerializerInterface
@@ -48,11 +49,11 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
      *
      * @throws \Exception
      */
-    public function import(string $domain, int $articleNumber, bool $forceImageDownload = false): Article
+    public function import(string $domain, int $number, bool $forceImageDownload = false): Image
     {
         try {
-            $this->log(LogLevel::INFO, 'Fetching article '.$articleNumber);
-            $response = $this->client->request('GET', $domain.'/api/articles/'.$articleNumber);
+            $this->log(LogLevel::INFO, 'Fetching image '.$number);
+            $response = $this->client->request('GET', $domain.'/api/images/'.$number);
             $content = $response->getBody()->getContents();
             $this->validateJson($content);
         } catch (ServerException | ClientException | GuzzleException $e) {
@@ -62,18 +63,14 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
         }
 
         if (!isset($content)) {
-            throw new \Exception('Couldn\'t fetch valid article json data from Newscoop');
+            throw new \Exception('Couldn\'t fetch valid image json data from Newscoop');
         }
 
-        /** @var Article $article */
-        $article = $this->serializer->deserialize($content, Article::class, 'json');
-        dump($content, $article);
-        $text = $this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody());
-        $text = $this->fetchAndReplaceBodyImages($text, $domain, $forceImageDownload);
-        $article->setBody($text);
-        $this->processRenditions($domain, $article, $forceImageDownload);
+        /** @var Image $image */
+        $image = $this->serializer->deserialize($content, Image::class, 'json');
+        $image->setDomain($domain);
 
-        return $article;
+        return $image;
     }
 
     /**

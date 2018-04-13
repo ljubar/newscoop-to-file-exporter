@@ -1,0 +1,17 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            url: '%env(RABBITMQ_URL)%'
+            heartbeat: 0
+            keepalive: true
+    producers:
+        newscoop_import:
+            connection:       default
+            exchange_options: { name: 'newscoop_import', type: direct }
+    consumers:
+        newscoop_import:
+            connection:       default
+            exchange_options: { name: 'newscoop_import', type: direct }
+            queue_options:    { name: 'newscoop_import'}
+            qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+            callback:         App\Consumer\NewscoopImportConsumer
