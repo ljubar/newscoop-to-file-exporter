@@ -27,12 +27,6 @@
         },
         "sort-packages": true
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../ninjs-php"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "App\\": "src/"
