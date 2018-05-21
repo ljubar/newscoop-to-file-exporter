@@ -149,6 +149,9 @@ class NinjsFactory implements FactoryInterface
         $imageItem = new Item($image->getDomain().'/images/'.$image->getBasename());
         $extension = pathinfo($imageItem->getGuid(), PATHINFO_EXTENSION);
         $mimeType = Mime::getMimeFromExtension($extension);
+        if (null === $mimeType || null === $image->getWidth() || null === $image->getHeight()) {
+            return;
+        }
         $imageItem->setType('picture');
         $imageItem->setHeadline($image->getDescription() ? strip_tags($image->getDescription()) : 'Image #'.$image->getId());
         $imageItem->setDescriptionHtml($image->getDescription());
@@ -253,11 +256,30 @@ class NinjsFactory implements FactoryInterface
             return;
         }
 
+        $bloggers = [
+            '5' => 'Leonardo Attuch',
+            '10' => 'Paulo Moreira Leite',
+            '20' => 'Tereza Cruvinel',
+            '30' => 'Breno Altman',
+            '40' => 'Hélio Doyle',
+            '50' => 'Luiz Moreira Júnior',
+            '60' => 'Alex Solnik',
+            '70' => 'Plínio Zúnica',
+            '80' => 'Emir Sader',
+            '90' => 'Carlos Lindenberg',
+            '91' => 'Mauro Lopes',
+            '110' => 'Lúcia Helena Issa',
+        ];
+
         $byline = [];
         foreach ($articleAuthors as $articleAuthor) {
             $author = new Author();
             $author->setName($articleAuthor['name']);
-            $author->setRole('editor');
+            if (\in_array($articleAuthor['name'], $bloggers, true)) {
+                $author->setRole('blogger');
+            } else {
+                $author->setRole('editor');
+            }
             $byline[] = $articleAuthor['name'];
             $item->addAuthor($author);
         }

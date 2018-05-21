@@ -71,7 +71,7 @@ class NewscoopImportConsumer implements ConsumerInterface
                     echo "Newswire is ignored \n";
                 }
             } elseif ($content instanceof ImageInterface) {
-                if ('' !== $content->getDescription()) {
+                if ($content->getDescription() && '' !== $content->getDescription() && 'Divulgação' !== $content->getPhotographer()) {
                     echo sprintf('Publishing image with id: %s', $content->getIdentifier())."\n";
                     $publisher->publish($content);
                 } else {

@@ -65,7 +65,7 @@ interface ImageInterface
     /**
      * @return string
      */
-    public function getWidth(): string;
+    public function getWidth(): ?string;
 
     /**
      * @param string $width
@@ -75,7 +75,7 @@ interface ImageInterface
     /**
      * @return string
      */
-    public function getHeight(): string;
+    public function getHeight(): ?string;
 
     /**
      * @param string $height

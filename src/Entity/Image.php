@@ -160,7 +160,7 @@ class Image extends Content implements ImageInterface
     /**
      * {@inheritdoc}
      */
-    public function getWidth(): string
+    public function getWidth(): ?string
     {
         return $this->width;
     }
@@ -176,7 +176,7 @@ class Image extends Content implements ImageInterface
     /**
      * {@inheritdoc}
      */
-    public function getHeight(): string
+    public function getHeight(): ?string
     {
         return $this->height;
     }
@@ -192,7 +192,7 @@ class Image extends Content implements ImageInterface
     /**
      * {@inheritdoc}
      */
-    public function getPhotographer(): string
+    public function getPhotographer(): ?string
     {
         return $this->photographer;
     }
