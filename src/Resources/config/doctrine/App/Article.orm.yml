@@ -1,0 +1,11 @@
+App\Entity\Article:
+  type: entity
+  table: articles
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    number:
+      type: integer

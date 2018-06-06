@@ -8,3 +8,4 @@
 /public/articles/
 /public/ninjs/
 deploy.php
+src/*.db3

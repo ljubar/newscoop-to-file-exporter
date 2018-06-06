@@ -11,10 +11,8 @@ namespace App\Command;
 
 use App\Entity\Article;
 use App\Factory\Brasil247NinjsFactory;
-use App\Importer\ImporterInterface;
 use App\Importer\NewscoopApiImporter;
 use App\Publisher\NinjsJsonPublisher;
-use App\Publisher\PublisherInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
@@ -33,16 +31,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Brasil247ImportCommand extends ContainerAwareCommand
 {
     /**
-     * @var ImporterInterface
-     */
-    protected $importer;
-
-    /**
-     * @var PublisherInterface
-     */
-    protected $publisher;
-
-    /**
      * {@inheritdoc}
      */
     protected function configure()
@@ -54,7 +42,6 @@ class Brasil247ImportCommand extends ContainerAwareCommand
             ->addArgument('domain', InputArgument::REQUIRED, 'Newscoop instance domain to fetch data from it.')
             ->addArgument('start', InputArgument::OPTIONAL, 'Number of article (start import from it).', null)
             ->addOption('force-image-download', null, InputOption::VALUE_NONE, 'Re-download images even if they are already fetched')
-            ->addOption('print-output', null, InputOption::VALUE_NONE, 'Prints result of publishing')
             ->addOption('single-fetch', '-s', InputOption::VALUE_OPTIONAL, 'Article number to fetch');
     }
 
@@ -103,6 +90,12 @@ class Brasil247ImportCommand extends ContainerAwareCommand
     {
         $article = $this->getArticles($logger, $client, $url);
 
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $processedArticle = $em->getRepository(Article::class)->findOneBy(['number' => $article['number']]);
+        if ($processedArticle) {
+            return;
+        }
+
         try {
             $producer->publish(json_encode([
                 'domain' => $domain,
@@ -112,6 +105,10 @@ class Brasil247ImportCommand extends ContainerAwareCommand
                 'publisherClass' => NinjsJsonPublisher::class,
                 'publisherFactoryClass' => Brasil247NinjsFactory::class,
             ]));
+            $processedArticle = new Article();
+            $processedArticle->setNumber($article['number']);
+            $em->persist($processedArticle);
+            $em->flush();
         } catch (\Exception $e) {
             $logger->log(LogLevel::ERROR, $e->getMessage());
         }
@@ -129,10 +126,16 @@ class Brasil247ImportCommand extends ContainerAwareCommand
     {
         $articles = $this->getArticles($logger, $client, $url);
         $processedArticles = 0;
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         foreach ($articles['items'] as $article) {
             if (null !== $start && $article['number'] > $start) {
                 continue;
             }
+            $processedArticle = $em->getRepository(Article::class)->findOneBy(['number' => $article['number']]);
+            if ($processedArticle) {
+                continue;
+            }
+
             try {
                 $producer->publish(json_encode([
                     'domain' => $domain,
@@ -143,10 +146,14 @@ class Brasil247ImportCommand extends ContainerAwareCommand
                     'publisherFactoryClass' => Brasil247NinjsFactory::class,
                 ]));
                 ++$processedArticles;
+                $processedArticle = new Article();
+                $processedArticle->setNumber($article['number']);
+                $em->persist($processedArticle);
             } catch (\Exception $e) {
                 $logger->log(LogLevel::ERROR, $e->getMessage());
             }
         }
+        $em->flush();
         $logger->log(LogLevel::INFO, 'Processed '.$processedArticles.' articles');
 
         if (isset($articles['pagination']['nextPageLink'])) {
@@ -160,6 +167,8 @@ class Brasil247ImportCommand extends ContainerAwareCommand
      * @param string        $url
      *
      * @return array|null
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function getArticles(ConsoleLogger $logger, Client $client, string $url): ?array
     {

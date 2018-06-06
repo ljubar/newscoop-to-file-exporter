@@ -38,6 +38,7 @@ services:
         public: true
         arguments:
             $publicDirPath: '%kernel.project_dir%/public'
+            $entityManager: '@doctrine.orm.entity_manager'
 
     App\Factory\Brasil247NinjsFactory:
         public: true

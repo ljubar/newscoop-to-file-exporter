@@ -19,6 +19,7 @@ use AHS\Ninjs\Superdesk\Rendition;
 use App\Entity\ContentInterface;
 use App\Entity\ImageInterface;
 use Behat\Transliterator\Transliterator;
+use Doctrine\ORM\EntityManagerInterface;
 use Hoa\Mime\Mime;
 use App\Entity\Rendition as ArticleRendition;
 
@@ -30,13 +31,20 @@ class NinjsFactory implements FactoryInterface
     protected $publicDirPath;
 
     /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
+
+    /**
      * NinjsFactory constructor.
      *
-     * @param string $publicDirPath
+     * @param string                 $publicDirPath
+     * @param EntityManagerInterface $entityManager
      */
-    public function __construct(string $publicDirPath)
+    public function __construct(string $publicDirPath, EntityManagerInterface $entityManager)
     {
         $this->publicDirPath = $publicDirPath;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -138,6 +146,7 @@ class NinjsFactory implements FactoryInterface
         $originalRendition->setHeight($height);
         $originalRendition->setMedia($imageFileName);
         $renditions->add('original', $originalRendition);
+        $renditions->add('baseImage', $originalRendition);
 
         $imageItem->setRenditions($renditions);
 

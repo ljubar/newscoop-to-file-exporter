@@ -1,0 +1,8 @@
+AHS\Ninjs\Superdesk\Item:
+  type: entity
+  table: items
+  id:
+    guid:
+      type: integer
+      generator:
+        strategy: AUTO

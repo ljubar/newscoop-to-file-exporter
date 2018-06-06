@@ -67,7 +67,6 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
 
         /** @var Article $article */
         $article = $this->serializer->deserialize($content, Article::class, 'json');
-        dump($content, $article);
         $text = $this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody());
         $text = $this->fetchAndReplaceBodyImages($text, $domain, $forceImageDownload);
         $article->setBody($text);

@@ -22,15 +22,15 @@ class Brasil247NinjsFactory extends NinjsFactory
 {
     const ISSUES = [
         3 => [
-            'name' => 'Blog e Colunas',
+            'name' => 'blog',
             'code' => 'blog',
         ],
         5 => [
-            'name' => 'Blog e Colunas',
+            'name' => 'blog',
             'code' => 'blog',
         ],
         6 => [
-            'name' => 'Destinos 247',
+            'name' => 'Destinos',
             'code' => 'dest',
         ],
         7 => [
@@ -49,10 +49,10 @@ class Brasil247NinjsFactory extends NinjsFactory
                 ],
                 5 => [
                     'name' => 'Brasil',
-                    'code' => 'Pod',
+                    'code' => 'Br',
                 ],
                 10 => [
-                    'name' => 'Blog e Colunas',
+                    'name' => 'blog',
                     'code' => 'blog',
                 ],
                 20 => [
@@ -156,8 +156,8 @@ class Brasil247NinjsFactory extends NinjsFactory
                     'code' => 'Per247',
                 ],
                 450 => [
-                    'name' => 'Revista',
-                    'code' => 'rev',
+                    'name' => 'Revista Brasil 247',
+                    'code' => 'RB',
                 ],
                 9999 => [
                     'name' => 'Apoio',
@@ -197,13 +197,12 @@ class Brasil247NinjsFactory extends NinjsFactory
      */
     public function setExtra(ArticleInterface $article, SuperdeskItem $item): void
     {
+        $extra = new Extra();
         if ('revista' === $article->getType()) {
-            $extra = new Extra();
             $extra->add('pdf', $article->getFields()['link_to_pdf']);
-            $item->setExtra($extra);
-
-            return;
         }
+        $extra->add('original_published_at', $item->getVersioncreated());
+        $item->setExtra($extra);
     }
 
     /**
