@@ -284,6 +284,12 @@ class NinjsFactory implements FactoryInterface
         foreach ($articleAuthors as $articleAuthor) {
             $author = new Author();
             $author->setName($articleAuthor['name']);
+            if (isset($articleAuthor['biography'])) {
+                $author->setBiography($articleAuthor['biography']);
+            }
+            if (isset($articleAuthor['image'])) {
+                $author->setAvatarUrl($articleAuthor['image']);
+            }
             if (\in_array($articleAuthor['name'], $bloggers, true)) {
                 $author->setRole('blogger');
             } else {

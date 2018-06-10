@@ -71,6 +71,7 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
         $text = $this->fetchAndReplaceBodyImages($text, $domain, $forceImageDownload);
         $article->setBody($text);
         $this->processRenditions($domain, $article, $forceImageDownload);
+        $this->processArticleAuthors($article);
 
         return $article;
     }

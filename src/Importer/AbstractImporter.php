@@ -145,6 +145,35 @@ abstract class AbstractImporter
     }
 
     /**
+     * @param Article $article
+     */
+    protected function processArticleAuthors(Article $article): void
+    {
+        $authors = [];
+        foreach ($article->getAuthors() as $key => $author) {
+            if (isset($author['link'])) {
+                try {
+                    $this->log(LogLevel::INFO, sprintf('Fetching author details from path: %s', $author['link']));
+                    $response = $this->client->request('GET', $author['link']);
+                } catch (ServerException | ClientException | GuzzleException $e) {
+                    $this->log(LogLevel::INFO, sprintf('Error on fetching author details. Error message: %s', $e->getMessage()));
+                }
+
+                $data = \json_decode($response->getBody()->getContents(), true);
+                dump($data);
+                if (isset($data['image'])) {
+                    $author['image'] = $data['image'];
+                }
+                if (isset($data['biography'])) {
+                    $author['biography'] = $data['biography'];
+                }
+            }
+            $authors[$key] = $author;
+        }
+        $article->setAuthors($authors);
+    }
+
+    /**
      * @param string $domain
      * @param string $text
      *
