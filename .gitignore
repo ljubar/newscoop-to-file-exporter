@@ -5,7 +5,7 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
-/public/articles/
-/public/ninjs/
+/public/articles/*
+/public/ninjs/*
 deploy.php
 src/*.db3
