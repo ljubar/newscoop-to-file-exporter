@@ -89,6 +89,7 @@ class NinjsFactory implements FactoryInterface
         $this->setAuthor($article, $item);
         $this->setCategory($article, $item);
         $this->setExtra($article, $item);
+        $this->removeStylingFromBody($article);
 
         return $item;
     }
@@ -240,6 +241,12 @@ class NinjsFactory implements FactoryInterface
     public function isSupported(ContentInterface $content): bool
     {
         return true;
+    }
+
+    protected function removeStylingFromBody(ArticleInterface $article)
+    {
+        $output = preg_replace('/(<[^>]+) style=".*?"/i', '$1', $article->getBody());
+        $article->setBody($output);
     }
 
     /**
