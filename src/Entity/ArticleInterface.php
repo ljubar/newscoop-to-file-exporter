@@ -177,4 +177,8 @@ interface ArticleInterface
      * @param string $type
      */
     public function setType(string $type): void;
+
+    public function getCommand(): ?string;
+
+    public function setCommand(string $command): void;
 }

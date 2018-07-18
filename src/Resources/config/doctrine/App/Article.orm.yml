@@ -9,3 +9,6 @@ App\Entity\Article:
   fields:
     number:
       type: integer
+    command:
+      type: string
+      nullable: true

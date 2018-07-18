@@ -88,6 +88,11 @@ class Article extends Content implements ArticleInterface
     protected $type;
 
     /**
+     * @var string
+     */
+    protected $command;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -381,6 +386,22 @@ class Article extends Content implements ArticleInterface
     public function setType(string $type): void
     {
         $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommand(): ?string
+    {
+        return $this->command;
+    }
+
+    /**
+     * @param string $command
+     */
+    public function setCommand(string $command): void
+    {
+        $this->command = $command;
     }
 
     /**

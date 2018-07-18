@@ -8,7 +8,16 @@ old_sound_rabbit_mq:
         newscoop_import:
             connection:       default
             exchange_options: { name: 'newscoop_import', type: direct }
+        newscoop_external_data:
+            connection:       default
+            exchange_options: { name: 'newscoop_external_data', type: direct }
     consumers:
+        newscoop_external_data:
+            connection:       default
+            exchange_options: { name: 'newscoop_external_data', type: direct }
+            queue_options:    { name: 'newscoop_external_data'}
+            qos_options:      {prefetch_size: 0, prefetch_count: 1, global: false}
+            callback:         App\Consumer\PublisherExternalDataConsumer
         newscoop_import:
             connection:       default
             exchange_options: { name: 'newscoop_import', type: direct }

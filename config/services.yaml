@@ -34,6 +34,9 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
 
+    App\Publisher\ExternalDataPublisher:
+        public: true
+
     App\Factory\NinjsFactory:
         public: true
         arguments:
@@ -47,9 +50,9 @@ services:
 
     App\Consumer\NewscoopImportConsumer:
         public: true
-        arguments:
 
-
+    App\Consumer\PublisherExternalDataConsumer:
+        public: true
 
     App\:
         resource: '../src/*'
