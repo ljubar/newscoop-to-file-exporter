@@ -142,7 +142,7 @@ class NinjsFactory implements FactoryInterface
 
         $renditions = new Renditions();
         $originalRendition = new Rendition($externalUrl);
-        $originalRendition->setMimetype(Mime::getMimeFromExtension($extension));
+        $originalRendition->setMimetype(Mime::getMimeFromExtension($extension)? Mime::getMimeFromExtension($extension) : 'image/jpeg');
         $originalRendition->setWidth($width);
         $originalRendition->setHeight($height);
         $originalRendition->setMedia($imageFileName);
