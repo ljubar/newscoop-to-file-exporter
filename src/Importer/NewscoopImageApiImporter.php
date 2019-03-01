@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace App\Importer;
 
 use AHS\Content\ContentInterface;
+use AHS\Serializer\NinjsSerializer;
 use AHS\Serializer\SerializerInterface;
 use App\Entity\Image;
 use GuzzleHttp\ClientInterface;
