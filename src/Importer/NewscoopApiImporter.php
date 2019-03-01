@@ -2,27 +2,19 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the NewscoopExporter application.
- *
- * Copyright 2018 Sourcefabric z.ú. and contributors.
- *
- * For the full copyright and license information, please see the
- * AUTHORS and LICENSE files distributed with this source code.
- *
- * @copyright 2018 Sourcefabric z.ú
- * @license http://www.superdesk.org/license
- */
-
 namespace App\Importer;
 
+use AHS\Content\ContentInterface;
 use App\Entity\Article;
+use AHS\Serializer\SerializerInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\GuzzleException;
-use JMS\Serializer\SerializerInterface;
 use Psr\Log\LogLevel;
+
+use function Safe\sprintf;
+use function Safe\json_decode;
 
 class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
 {
@@ -31,24 +23,13 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
      */
     protected $serializer;
 
-    /**
-     * NewscoopApiImporter constructor.
-     *
-     * @param ClientInterface     $client
-     * @param SerializerInterface $serializer
-     */
     public function __construct(ClientInterface $client, SerializerInterface $serializer)
     {
         $this->client = $client;
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Exception
-     */
-    public function import(string $domain, int $articleNumber, bool $forceImageDownload = false): Article
+    public function import(string $domain, int $articleNumber, bool $forceImageDownload = false): ContentInterface
     {
         try {
             $this->log(LogLevel::INFO, 'Fetching article '.$articleNumber);
@@ -56,7 +37,7 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
             $content = $response->getBody()->getContents();
             $this->validateJson($content);
         } catch (ServerException | ClientException | GuzzleException $e) {
-            $this->log(LogLevel::ERROR, sprintf('Error on fetching article. Error message: %s', $e->getMessage()));
+            $this->log(LogLevel::ERROR, sprintf("Error on fetching article: \n %s", $e->getMessage()));
         } catch (\Exception $e) {
             $this->log(LogLevel::ERROR, $e->getMessage());
         }
@@ -76,13 +57,6 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
         return $article;
     }
 
-    /**
-     * @param string $string
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
     private function validateJson(string $string): bool
     {
         json_decode($string);

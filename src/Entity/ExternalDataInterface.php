@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use AHS\Content\ContentInterface;
+
 interface ExternalDataInterface extends ContentInterface
 {
     public function getExternalData(): array;

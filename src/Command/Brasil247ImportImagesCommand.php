@@ -9,27 +9,25 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\Article;
-use App\Factory\NinjsFactory;
+use AHS\Factory\NinjsFactory;
 use App\Importer\ImporterInterface;
 use App\Importer\NewscoopImageApiImporter;
-use App\Publisher\NinjsJsonPublisher;
-use App\Publisher\PublisherInterface;
+use AHS\Publisher\NinjsPublisher;
+use AHS\Publisher\PublisherInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class Brasil247ImportImagesCommand.
- */
+use function Safe\json_encode;
+use function Safe\json_decode;
+
 class Brasil247ImportImagesCommand extends ContainerAwareCommand
 {
     /**
@@ -42,9 +40,6 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
      */
     protected $publisher;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -58,9 +53,6 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
             ->addOption('single-fetch', '-s', InputOption::VALUE_OPTIONAL, 'Article number to fetch');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $start = $input->getArgument('start');
@@ -92,13 +84,6 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param ProducerInterface $producer
-     * @param ConsoleLogger     $logger
-     * @param Client            $client
-     * @param string            $url
-     * @param string            $domain
-     */
     protected function processImage(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain): void
     {
         $image = $this->getData($logger, $client, $url);
@@ -109,7 +94,7 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
                 'contentId' => $image['id'],
                 'forceImageDownload' => true,
                 'importerClass' => NewscoopImageApiImporter::class,
-                'publisherClass' => NinjsJsonPublisher::class,
+                'publisherClass' => NinjsPublisher::class,
                 'publisherFactoryClass' => NinjsFactory::class,
             ]));
         } catch (\Exception $e) {
@@ -117,14 +102,6 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param ProducerInterface $producer
-     * @param ConsoleLogger     $logger
-     * @param Client            $client
-     * @param string            $url
-     * @param string            $domain
-     * @param int|null          $start
-     */
     protected function processImages(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain, int $start = null): void
     {
         $images = $this->getData($logger, $client, $url);
@@ -139,7 +116,7 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
                     'contentId' => $image['id'],
                     'forceImageDownload' => true,
                     'importerClass' => NewscoopImageApiImporter::class,
-                    'publisherClass' => NinjsJsonPublisher::class,
+                    'publisherClass' => NinjsPublisher::class,
                     'publisherFactoryClass' => NinjsFactory::class,
                 ]));
                 ++$processedImages;
@@ -154,13 +131,6 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param ConsoleLogger $logger
-     * @param Client        $client
-     * @param string        $url
-     *
-     * @return array|null
-     */
     protected function getData(ConsoleLogger $logger, Client $client, string $url): ?array
     {
         $logger->log(LogLevel::INFO, 'Fetching images from url: '.$url);

@@ -16,21 +16,30 @@ declare(strict_types=1);
 
 namespace App\Publisher;
 
-use App\Entity\ContentInterface;
+use AHS\Content\ContentInterface;
+use AHS\Publisher\AbstractPublisher;
+use AHS\Publisher\PublisherInterface;
+use App\Entity\ExternalDataInterface;
 use Behat\Transliterator\Transliterator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+
+use function Safe\json_encode;
 
 class ExternalDataPublisher extends AbstractPublisher implements PublisherInterface
 {
     public function publish(ContentInterface $content, $printRenderedTemplate = false): void
     {
+        if (! $content instanceof ExternalDataInterface) {
+            return;
+        }
+
         $data = $content->getExternalData();
         $slug = Transliterator::urlize($data['title']);
         unset($data['title']);
         $client = new Client();
         try {
-            $body = \json_encode($data, JSON_UNESCAPED_SLASHES);
+            $body = json_encode($data, JSON_UNESCAPED_SLASHES);
             $requestData = ['body' => $body];
             if (null !== $content->getPublisherSecret()) {
                 $token = hash_hmac('sha1', $body, $content->getPublisherSecret());

@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
-/**
- * Class Article.
- */
+use AHS\Content\ArticleInterface;
+use AHS\Content\Content;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+
+use function Safe\strtotime;
+
 class Article extends Content implements ArticleInterface
 {
     /**
@@ -19,23 +22,25 @@ class Article extends Content implements ArticleInterface
 
     /**
      * @var \DateTime
+     * @SerializedName("created")
      */
     protected $createdAt;
 
     /**
      * @var \DateTime
+     * @SerializedName("published")
      */
     protected $publishedAt;
 
     /**
      * @var array
      */
-    protected $authors;
+    protected $authors = [];
 
     /**
      * @var array
      */
-    protected $keywords;
+    protected $keywords = [];
 
     /**
      * @var string
@@ -60,7 +65,7 @@ class Article extends Content implements ArticleInterface
     /**
      * @var array
      */
-    protected $renditions;
+    protected $renditions = [];
 
     /**
      * @var string
@@ -93,144 +98,138 @@ class Article extends Content implements ArticleInterface
     protected $command;
 
     /**
-     * @return mixed
+     * @var string
      */
-    public function getId()
+    protected $status;
+
+    /**
+     * @var string
+     */
+    protected $description = '';
+
+    public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
+    public function setId(int $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getIdentifier()
     {
         return $this->getNumber();
     }
 
-    /**
-     * @return mixed
-     */
     public function getNumber()
     {
         return $this->number;
     }
 
-    /**
-     * @param mixed $number
-     */
     public function setNumber($number)
     {
         $this->number = $number;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCreatedAt()
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description)
+    {
+        $this->description = $description;
+    }
+
+    public function getImage()
+    {
+        // TODO: Implement getImage() method.
+    }
+
+    public function getImages(): array
+    {
+        return [];
+    }
+
+    public function setImages(array $images = null)
+    {
+        // TODO: Implement setImages() method.
+    }
+
+    public function isPublished(): bool
+    {
+       return $this->getStatus() === 'Y';
+    }
+
+    public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
     }
 
-    /**
-     * @param mixed $createdAt
-     */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt(string $createdAt)
     {
+        if (is_string($createdAt)) {
+            $createdAt = (new \DateTime())->setTimestamp(strtotime($createdAt));
+        }
+
         $this->createdAt = $createdAt;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPublishedAt()
+    public function getPublishedAt(): \DateTime
     {
         return $this->publishedAt;
     }
 
-    /**
-     * @param mixed $publishedAt
-     */
-    public function setPublishedAt($publishedAt)
+    public function setPublishedAt(string $publishedAt)
     {
+        if (is_string($publishedAt)) {
+            $publishedAt = (new \DateTime())->setTimestamp(strtotime($publishedAt));
+        }
+
         $this->publishedAt = $publishedAt;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAuthors()
+    public function getAuthors(): array
     {
         return $this->authors;
     }
 
-    /**
-     * @param mixed $authors
-     */
     public function setAuthors(array $authors)
     {
         $this->authors = $authors;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getKeywords()
+    public function getKeywords(): array
     {
         return $this->keywords;
     }
 
-    /**
-     * @param mixed $keywords
-     */
     public function setKeywords($keywords)
     {
         $this->keywords = $keywords;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param mixed $title
-     */
-    public function setTitle($title)
+    public function setTitle(string $title)
     {
         $this->title = $title;
     }
 
-    /**
-     * @return mixed
-     */
     public function getWebcode()
     {
         return $this->webcode;
     }
 
-    /**
-     * @param mixed $webcode
-     */
     public function setWebcode($webcode)
     {
         $this->webcode = $webcode;
     }
 
-    /**
-     * @param array $fields
-     */
     public function setFields(array $fields)
     {
         if (array_key_exists('tekst', $fields)) {
@@ -248,51 +247,31 @@ class Article extends Content implements ArticleInterface
         $this->fields = $fields;
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
         return  $this->fields;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @param mixed $url
-     */
     public function setUrl($url)
     {
         $this->url = $url;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getRenditions()
+    public function getRenditions(): array
     {
         return $this->renditions;
     }
 
-    /**
-     * @param mixed $renditions
-     */
-    public function setRenditions($renditions)
+    public function setRenditions(array $renditions)
     {
         $this->renditions = $renditions;
     }
 
-    /**
-     * @param string $caption
-     *
-     * @return Rendition|null
-     */
     public function getRendition(string $caption): ?Rendition
     {
         foreach ($this->getRenditions() as $rendition) {
@@ -304,26 +283,17 @@ class Article extends Content implements ArticleInterface
         return null;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
 
-    /**
-     * @param mixed $language
-     */
     public function setLanguage($language)
     {
         $this->language = $language;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getIssue()
+    public function getIssue(): string
     {
         return $this->issue;
     }
@@ -336,26 +306,17 @@ class Article extends Content implements ArticleInterface
         $this->issue = $issue;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getSection()
+    public function getSection(): string
     {
         return $this->section;
     }
 
-    /**
-     * @param mixed $section
-     */
     public function setSection($section)
     {
         $this->section = $section;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getBody()
+    public function getBody(): string
     {
         if (null === $this->body) {
             return '';
@@ -364,59 +325,48 @@ class Article extends Content implements ArticleInterface
         return $this->body;
     }
 
-    /**
-     * @param mixed $body
-     */
-    public function setBody($body)
+    public function setBody(string $body): void
     {
         $this->body = $body;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     */
     public function setType(string $type): void
     {
         $this->type = $type;
     }
 
-    /**
-     * @return string
-     */
     public function getCommand(): ?string
     {
         return $this->command;
     }
 
-    /**
-     * @param string $command
-     */
     public function setCommand(string $command): void
     {
         $this->command = $command;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOutputFileLocation(): string
     {
         return explode('/', $this->getUrl())[2];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOutputFileName(): string
     {
         return $this->getNumber().'.json';
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): void
+    {
+        $this->status = $status;
     }
 }

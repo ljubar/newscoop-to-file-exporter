@@ -9,14 +9,18 @@ declare(strict_types=1);
 
 namespace App\Consumer;
 
-use App\Entity\ArticleInterface;
+use AHS\Content\ArticleInterface;
+use AHS\Factory\FactoryInterface;
+use AHS\Publisher\PublisherInterface;
 use App\Entity\ImageInterface;
 use App\Importer\ImporterInterface;
-use App\Publisher\PublisherInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use function Safe\sprintf;
+use function Safe\json_decode;
 
 class NewscoopImportConsumer implements ConsumerInterface
 {
@@ -30,24 +34,13 @@ class NewscoopImportConsumer implements ConsumerInterface
      */
     protected $logger;
 
-    /**
-     * NewscoopImportConsumer constructor.
-     *
-     * @param ContainerInterface $container
-     * @param LoggerInterface    $logger
-     */
     public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->logger = $logger;
     }
 
-    /**
-     * @param AMQPMessage $msg
-     *
-     * @return mixed|void
-     */
-    public function execute(AMQPMessage $msg)
+    public function execute(AMQPMessage $msg): int
     {
         $data = json_decode($msg->body, true);
         /** @var ImporterInterface $importer */
@@ -56,7 +49,9 @@ class NewscoopImportConsumer implements ConsumerInterface
         $publisher = $this->container->get($data['publisherClass']);
         $importer->setLogger($this->logger);
         $publisher->setLogger($this->logger);
-        $publisher->setFactory($this->container->get($data['publisherFactoryClass']));
+        /** @var FactoryInterface $factory */
+        $factory = $this->container->get($data['publisherFactoryClass']);
+        $publisher->setFactory($factory);
 
         try {
             echo sprintf('Importing item: %s', $data['contentId'])."\n";
@@ -65,7 +60,7 @@ class NewscoopImportConsumer implements ConsumerInterface
             if ($content instanceof ArticleInterface) {
                 // Check if it's in selected issue and sections
                 if ('newswire' !== $content->getType()) {
-                    echo sprintf('Publishing article from issue: %s and section: %s and type: %s', $content->getIssue()['number'], $content->getSection()['number'], $content->getType())."\n";
+                    echo sprintf('Publishing article from issue: %s and section: %s and type: %s', $content->getIssue(), $content->getSection(), $content->getType())."\n";
                     $publisher->publish($content);
                 } else {
                     echo "Newswire is ignored \n";

@@ -3,6 +3,7 @@
 .env
 /public/bundles/
 /var/
+!/var/import_config
 /vendor/
 ###< symfony/framework-bundle ###
 /public/articles/*

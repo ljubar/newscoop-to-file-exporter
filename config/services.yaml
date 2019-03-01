@@ -15,13 +15,11 @@ services:
         public: true
         arguments:
             $client: '@GuzzleHttp\ClientInterface'
-            $serializer: '@jms_serializer'
 
     App\Importer\NewscoopImageApiImporter:
         public: true
         arguments:
             $client: '@GuzzleHttp\ClientInterface'
-            $serializer: '@jms_serializer'
 
     App\Publisher\TwigHtmlPublisher:
         public: true
@@ -29,7 +27,7 @@ services:
             $twig: '@twig'
             $projectDir: '%kernel.project_dir%'
 
-    App\Publisher\NinjsJsonPublisher:
+    AHS\Publisher\NinjsPublisher:
         public: true
         arguments:
             $projectDir: '%kernel.project_dir%'
@@ -37,16 +35,16 @@ services:
     App\Publisher\ExternalDataPublisher:
         public: true
 
-    App\Factory\NinjsFactory:
+    AHS\Factory\NinjsFactory:
         public: true
-        arguments:
-            $publicDirPath: '%kernel.project_dir%/public'
-            $entityManager: '@doctrine.orm.entity_manager'
+    AHS\Factory\FactoryInterface: '@AHS\Factory\NinjsFactory'
+
+    AHS\Serializer\NinjsSerializer:
+        class: AHS\Serializer\NinjsSerializer
+    AHS\Serializer\SerializerInterface: '@AHS\Serializer\NinjsSerializer'
 
     App\Factory\Brasil247NinjsFactory:
         public: true
-        arguments:
-            $publicDirPath: '%kernel.project_dir%/public'
 
     App\Consumer\NewscoopImportConsumer:
         public: true
@@ -58,5 +56,5 @@ services:
         resource: '../src/*'
         exclude: '../src/{Entity,Migrations,Factory,Importer,Publisher,Consumer}'
 
-    App\Serializer\SerializerInterface: '@App\Serializer\NinjsSerializer'
-    App\Factory\FactoryInterface: '@App\Factory\NinjsFactory'
+    metadata_aware_name_converter:
+        class: Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter

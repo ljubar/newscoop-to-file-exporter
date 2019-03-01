@@ -16,14 +16,17 @@ declare(strict_types=1);
 
 namespace App\Importer;
 
-use App\Entity\Article;
+use AHS\Content\ContentInterface;
+use AHS\Serializer\SerializerInterface;
 use App\Entity\Image;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\GuzzleException;
-use JMS\Serializer\SerializerInterface;
 use Psr\Log\LogLevel;
+
+use function Safe\sprintf;
+use function Safe\json_decode;
 
 class NewscoopImageApiImporter extends AbstractImporter implements ImporterInterface
 {
@@ -32,24 +35,13 @@ class NewscoopImageApiImporter extends AbstractImporter implements ImporterInter
      */
     protected $serializer;
 
-    /**
-     * NewscoopApiImporter constructor.
-     *
-     * @param ClientInterface     $client
-     * @param SerializerInterface $serializer
-     */
     public function __construct(ClientInterface $client, SerializerInterface $serializer)
     {
         $this->client = $client;
         $this->serializer = $serializer;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \Exception
-     */
-    public function import(string $domain, int $number, bool $forceImageDownload = false): Image
+    public function import(string $domain, int $number, bool $forceImageDownload = false): ContentInterface
     {
         try {
             $this->log(LogLevel::INFO, 'Fetching image '.$number);

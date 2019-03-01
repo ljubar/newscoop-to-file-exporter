@@ -8,6 +8,8 @@
 
 namespace App\Entity;
 
+use AHS\Content\Content;
+
 class ExternalData extends Content implements ExternalDataInterface
 {
     protected $externalData = [];

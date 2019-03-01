@@ -1,10 +1,4 @@
 <?php
-/*
- * Copyright (C) Paweł Mikołajczuk Creative Apps - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Paweł Mikołajczuk <pawel@mikolajczuk.in>, 2017.
- */
 declare(strict_types=1);
 
 namespace App\Command;
@@ -21,6 +15,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use function Safe\json_encode;
+use function Safe\json_decode;
 
 class SetPackageExternalDataCommand extends ContainerAwareCommand
 {
@@ -39,7 +36,7 @@ class SetPackageExternalDataCommand extends ContainerAwareCommand
     }
 
 
-    protected function execute(InputInterface $input, OutputInterface $output): void
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $start = $input->getArgument('start');
         if (null !== $start) {
@@ -137,7 +134,16 @@ class SetPackageExternalDataCommand extends ContainerAwareCommand
         $logger->log(LogLevel::INFO, 'Processed '.$processedArticles.' articles');
 
         if (isset($articles['pagination']['nextPageLink'])) {
-            $this->processArticles($producer, $logger, $client, $articles['pagination']['nextPageLink'], $domain);
+            $this->processArticles(
+                $producer,
+                $logger,
+                $client,
+                $articles['pagination']['nextPageLink'],
+                $newscoopDomain,
+                $publisherDomain,
+                $publisherSecret,
+                $fields
+            );
         }
     }
 
@@ -158,15 +164,6 @@ class SetPackageExternalDataCommand extends ContainerAwareCommand
         return $processedArticle;
     }
 
-    /**
-     * @param ConsoleLogger $logger
-     * @param Client        $client
-     * @param string        $url
-     *
-     * @return array|null
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
     protected function getArticles(ConsoleLogger $logger, Client $client, string $url): ?array
     {
         $logger->log(LogLevel::INFO, 'Fetching articles from url: '.$url);

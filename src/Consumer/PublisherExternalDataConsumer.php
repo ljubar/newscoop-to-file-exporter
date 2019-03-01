@@ -10,11 +10,14 @@ declare(strict_types=1);
 namespace App\Consumer;
 
 use App\Entity\ExternalData;
-use App\Publisher\PublisherInterface;
+use AHS\Publisher\PublisherInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use function Safe\sprintf;
+use function Safe\json_decode;
 
 class PublisherExternalDataConsumer implements ConsumerInterface
 {
@@ -28,12 +31,6 @@ class PublisherExternalDataConsumer implements ConsumerInterface
      */
     protected $logger;
 
-    /**
-     * NewscoopImportConsumer constructor.
-     *
-     * @param ContainerInterface $container
-     * @param LoggerInterface    $logger
-     */
     public function __construct(ContainerInterface $container, LoggerInterface $logger)
     {
         $this->container = $container;

@@ -2,25 +2,16 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the NewscoopExporter application.
- *
- * Copyright 2018 Sourcefabric z.ú. and contributors.
- *
- * For the full copyright and license information, please see the
- * AUTHORS and LICENSE files distributed with this source code.
- *
- * @copyright 2018 Sourcefabric z.ú
- * @license http://www.superdesk.org/license
- */
-
 namespace App\Publisher;
 
-use App\Entity\Article;
-use App\Entity\ArticleInterface;
-use App\Entity\ContentInterface;
+use AHS\Content\ArticleInterface;
+use AHS\Content\ContentInterface;
+use AHS\Publisher\AbstractPublisher;
+use AHS\Publisher\PublisherInterface;
 use Psr\Log\LogLevel;
 use Twig\Environment;
+
+use function Safe\preg_replace;
 
 class TwigHtmlPublisher extends AbstractPublisher implements PublisherInterface
 {
@@ -34,28 +25,19 @@ class TwigHtmlPublisher extends AbstractPublisher implements PublisherInterface
      */
     protected $projectDir;
 
-    /**
-     * TwigHtmlPublisher constructor.
-     *
-     * @param Environment $twig
-     * @param string      $projectDir
-     */
     public function __construct(Environment $twig, string $projectDir)
     {
         $this->twig = $twig;
         $this->projectDir = $projectDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function publish(ContentInterface $article, $printRenderedTemplate = false): void
     {
         if (!$article instanceof ArticleInterface) {
             return;
         }
         $this->log(LogLevel::INFO, 'Rendering article '.$article->getIdentifier());
-        $content = $this->twig->render('article.html.twig', ['article' => $content]);
+        $content = $this->twig->render('article.html.twig', ['article' => $article]);
 
         if ($printRenderedTemplate) {
             $this->log(LogLevel::INFO, $content);

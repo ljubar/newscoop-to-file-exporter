@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-/**
- * Class Image.
- */
+use AHS\Content\Content;
+
 class Image extends Content implements ImageInterface
 {
     /**

@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Entity\Article;
+use AHS\Content\Article;
+use AHS\Publisher\NinjsPublisher;
 use App\Importer\NewscoopApiImporter;
-use App\Publisher\NinjsJsonPublisher;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,12 +47,23 @@ class ApiToNinjsCommand extends ContainerAwareCommand
 
         $logger = new ConsoleLogger($output);
         $importer = $this->getContainer()->get(NewscoopApiImporter::class);
-        $publisher = $this->getContainer()->get(NinjsJsonPublisher::class);
+        $publisher = $this->getContainer()->get(NinjsPublisher::class);
         $importer->setLogger($logger);
         $publisher->setLogger($logger);
         for ($number = $start; $number <= $end; ++$number) {
-            $article = $importer->import($input->getArgument('domain'), $number, $input->getOption('force-image-download'));
-            if ('imagem' === $article->getType()) {
+            try {
+                /** @var Article $article */
+                $article = $importer->import(
+                    $input->getArgument('domain'),
+                    $number,
+                    $input->getOption('force-image-download')
+                );
+            } catch (\Exception $e) {
+                $logger->error($e->getMessage());
+                continue;
+            }
+
+            if (!$article->isPublished()) {
                 continue;
             }
 

@@ -1,10 +1,4 @@
 <?php
-/*
- * Copyright (C) Paweł Mikołajczuk Creative Apps - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Paweł Mikołajczuk <pawel@mikolajczuk.in>, 2017.
- */
 declare(strict_types=1);
 
 namespace App\Command;
@@ -12,27 +6,23 @@ namespace App\Command;
 use App\Entity\Article;
 use App\Factory\Brasil247NinjsFactory;
 use App\Importer\NewscoopApiImporter;
-use App\Publisher\NinjsJsonPublisher;
+use AHS\Publisher\NinjsPublisher;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 use OldSound\RabbitMqBundle\RabbitMq\ProducerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class Brasil247ImportCommand.
- */
+use function Safe\json_encode;
+use function Safe\json_decode;
+
 class Brasil247ImportCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -45,9 +35,6 @@ class Brasil247ImportCommand extends ContainerAwareCommand
             ->addOption('single-fetch', '-s', InputOption::VALUE_OPTIONAL, 'Article number to fetch');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $start = $input->getArgument('start');
@@ -79,13 +66,6 @@ class Brasil247ImportCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param ProducerInterface $producer
-     * @param ConsoleLogger     $logger
-     * @param Client            $client
-     * @param string            $url
-     * @param string            $domain
-     */
     protected function processArticle(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain): void
     {
         $article = $this->getArticles($logger, $client, $url);
@@ -102,7 +82,7 @@ class Brasil247ImportCommand extends ContainerAwareCommand
                 'contentId' => $article['number'],
                 'forceImageDownload' => true,
                 'importerClass' => NewscoopApiImporter::class,
-                'publisherClass' => NinjsJsonPublisher::class,
+                'publisherClass' => NinjsPublisher::class,
                 'publisherFactoryClass' => Brasil247NinjsFactory::class,
             ]));
             $processedArticle = new Article();
@@ -114,14 +94,6 @@ class Brasil247ImportCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param ProducerInterface $producer
-     * @param ConsoleLogger     $logger
-     * @param Client            $client
-     * @param string            $url
-     * @param string            $domain
-     * @param int|null          $start
-     */
     protected function processArticles(ProducerInterface $producer, ConsoleLogger $logger, Client $client, string $url, string $domain, int $start = null): void
     {
         $articles = $this->getArticles($logger, $client, $url);
@@ -142,7 +114,7 @@ class Brasil247ImportCommand extends ContainerAwareCommand
                     'contentId' => $article['number'],
                     'forceImageDownload' => true,
                     'importerClass' => NewscoopApiImporter::class,
-                    'publisherClass' => NinjsJsonPublisher::class,
+                    'publisherClass' => NinjsPublisher::class,
                     'publisherFactoryClass' => Brasil247NinjsFactory::class,
                 ]));
                 ++$processedArticles;
@@ -161,15 +133,6 @@ class Brasil247ImportCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param ConsoleLogger $logger
-     * @param Client        $client
-     * @param string        $url
-     *
-     * @return array|null
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
     protected function getArticles(ConsoleLogger $logger, Client $client, string $url): ?array
     {
         $logger->log(LogLevel::INFO, 'Fetching articles from url: '.$url);

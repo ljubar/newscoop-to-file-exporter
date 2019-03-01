@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use AHS\Content\ArticleInterface;
+
 /**
  * Class Article.
  */

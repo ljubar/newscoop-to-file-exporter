@@ -1,23 +1,15 @@
 <?php
-/*
- * Copyright (C) Paweł Mikołajczuk Creative Apps - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Paweł Mikołajczuk <pawel@mikolajczuk.in>, 2017.
- */
 declare(strict_types=1);
 
 namespace App\Factory;
 
+use AHS\Factory\NinjsFactory;
 use AHS\Ninjs\Superdesk\Extra;
 use AHS\Ninjs\Superdesk\Service;
-use App\Entity\ArticleInterface;
+use AHS\Content\ArticleInterface;
 use AHS\Ninjs\Superdesk\Item as SuperdeskItem;
-use App\Entity\ContentInterface;
+use AHS\Content\ContentInterface;
 
-/**
- * Class Brasil247NinjsFactory.
- */
 class Brasil247NinjsFactory extends NinjsFactory
 {
     const ISSUES = [
@@ -195,7 +187,7 @@ class Brasil247NinjsFactory extends NinjsFactory
     /**
      * {@inheritdoc}
      */
-    public function setExtra(ArticleInterface $article, SuperdeskItem $item): void
+    public function setExtra(ArticleInterface $article, SuperdeskItem $item, $extra = null): void
     {
         $extra = new Extra();
         if ('revista' === $article->getType()) {
@@ -219,10 +211,16 @@ class Brasil247NinjsFactory extends NinjsFactory
             return;
         }
 
-        $issueNumber = $article->getIssue()['number'];
-        $sectionNumber = $article->getSection()['number'];
+        $issueNumber = $article->getIssue();
+        $sectionNumber = $article->getSection();
+        $category = null;
+        $code = null;
 
-        if (array_key_exists($issueNumber, self::ISSUES)) {
+        if (!is_string($issueNumber)) {
+            return;
+        }
+
+        if (array_key_exists((int) $issueNumber, self::ISSUES)) {
             if (isset(self::ISSUES[$issueNumber]['name'])) {
                 $category = self::ISSUES[$issueNumber]['name'];
                 $code = self::ISSUES[$issueNumber]['code'];
@@ -232,11 +230,9 @@ class Brasil247NinjsFactory extends NinjsFactory
             }
         }
 
-        if (!isset($category)) {
-            throw new \Exception(sprintf('no category for issue: %s and section: %s', $issueNumber, $sectionNumber));
+        if (null !== $category && null !== $code) {
+            $item->addService(new Service($category, (string)$code));
         }
-
-        $item->addService(new Service($category, (string) $code));
     }
 
     /**

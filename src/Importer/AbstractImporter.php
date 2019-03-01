@@ -26,6 +26,12 @@ use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Filesystem;
 
+use function Safe\sprintf;
+use function Safe\file_put_contents;
+use function Safe\substr;
+use function Safe\preg_replace;
+use function Safe\json_decode;
+
 abstract class AbstractImporter
 {
     use LoggerTrait;
@@ -35,21 +41,14 @@ abstract class AbstractImporter
      */
     protected $client;
 
-    /**
-     * @param string $text
-     * @param string $domain
-     * @param bool   $forceImageDownload
-     *
-     * @return string
-     */
     protected function fetchAndReplaceBodyImages(string $text, string $domain, bool $forceImageDownload): string
     {
         if ('' === $text) {
             return $text;
         }
 
-        libxml_use_internal_errors(true);
-        $dom = new \DOMdocument();
+        \libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
 
         /*** load the html into the object ***/
         $dom->loadHTML(mb_convert_encoding($text, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -95,11 +94,6 @@ abstract class AbstractImporter
         return $dom->saveHTML($dom->documentElement);
     }
 
-    /**
-     * @param string  $domain
-     * @param Article $article
-     * @param bool    $forceImageDownload
-     */
     protected function processRenditions(string $domain, Article $article, bool $forceImageDownload)
     {
         $downloadedImages = [];
@@ -144,28 +138,28 @@ abstract class AbstractImporter
         }
     }
 
-    /**
-     * @param Article $article
-     */
     protected function processArticleAuthors(Article $article): void
     {
+        if (count($article->getAuthors()) === 0) {
+            return;
+        }
+
         $authors = [];
         foreach ($article->getAuthors() as $key => $author) {
             if (isset($author['link'])) {
                 try {
                     $this->log(LogLevel::INFO, sprintf('Fetching author details from path: %s', $author['link']));
                     $response = $this->client->request('GET', $author['link']);
-                } catch (ServerException | ClientException | GuzzleException $e) {
-                    $this->log(LogLevel::INFO, sprintf('Error on fetching author details. Error message: %s', $e->getMessage()));
-                }
 
-                $data = \json_decode($response->getBody()->getContents(), true);
-                dump($data);
-                if (isset($data['image'])) {
-                    $author['image'] = $data['image'];
-                }
-                if (isset($data['biography'])) {
-                    $author['biography'] = $data['biography'];
+                    $data = json_decode($response->getBody()->getContents(), true);
+                    if (isset($data['image'])) {
+                        $author['image'] = $data['image'];
+                    }
+                    if (isset($data['biography'])) {
+                        $author['biography'] = $data['biography'];
+                    }
+                } catch (ServerException | ClientException | GuzzleException $e ) {
+                    $this->log(LogLevel::INFO, sprintf('Error on fetching author details. Error message: %s', $e->getMessage()));
                 }
             }
             $authors[$key] = $author;
@@ -173,12 +167,6 @@ abstract class AbstractImporter
         $article->setAuthors($authors);
     }
 
-    /**
-     * @param string $domain
-     * @param string $text
-     *
-     * @return string
-     */
     protected function replaceRelativeUrlsWithAbsolute(string $domain, string $text): string
     {
         return preg_replace("/(href|src)\=\"([^(http)])(\/)?/", "$1=\"$domain$2", $text);
