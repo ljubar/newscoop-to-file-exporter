@@ -10,7 +10,7 @@ use AHS\Content\ArticleInterface;
 use AHS\Ninjs\Superdesk\Item as SuperdeskItem;
 use AHS\Content\ContentInterface;
 
-class Brasil247NinjsFactory extends NinjsFactory
+class InsajderNinjsFactory extends NinjsFactory
 {
     const ISSUES = [
         3 => [
