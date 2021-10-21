@@ -171,7 +171,7 @@ class InsajderNinjsFactory extends NinjsFactory
                     'name' => 'Intervju - Milan Obradović',
                     'code' => 'mobradovic',
                 ],
-                xxx => [
+                300 => [
                     'name' => 'Intervju - Čedomir Jovanović',
                     'code' => 'cjovanovic',
                 ],
