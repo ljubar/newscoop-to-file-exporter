@@ -28,7 +28,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function Safe\json_encode;
 use function Safe\json_decode;
 
-class Brasil247ImportImagesCommand extends ContainerAwareCommand
+class InsajderImportImagesCommand extends ContainerAwareCommand
 {
     /**
      * @var ImporterInterface
@@ -43,8 +43,8 @@ class Brasil247ImportImagesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('newscoop:import-brasil247:images')
-            ->setDescription('Imports newscoop images from brasil247 and save it to json (ninjs).')
+            ->setName('newscoop:import-insajder:images')
+            ->setDescription('Imports newscoop images from insajder and save it to json (ninjs).')
             ->setHelp('This command allows to import Newscoop images with API and save them to nonjs formated json files')
             ->addArgument('domain', InputArgument::REQUIRED, 'Newscoop instance domain to fetch data from it.')
             ->addArgument('start', InputArgument::OPTIONAL, 'Number of image (start import from it).', null)

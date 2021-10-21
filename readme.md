@@ -7,7 +7,7 @@ Imported files can be used by Superdesk ingest (or any other system supporting n
 ## Commands
 ```
   newscoop:import-and-save-to-ninjs  Imports newscoop articles and save it to json files with content in ninjs format.
-  newscoop:import-brasil247          Imports newscoop articles from brasil247 and save it to json.
-  newscoop:import-brasil247:images   Imports newscoop images from brasil247 and save it to json (ninjs).
+  newscoop:import-insajder          Imports newscoop articles from insajder and save it to json.
+  newscoop:import-insajder:images   Imports newscoop images from insajder and save it to json (ninjs).
   rabbitmq:consumer newscoop_import  Process items in queue.
 ```

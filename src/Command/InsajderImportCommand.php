@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Entity\Article;
-use App\Factory\Brasil247NinjsFactory;
+use App\Factory\InsajderNinjsFactory;
 use App\Importer\NewscoopApiImporter;
 use AHS\Publisher\NinjsPublisher;
 use GuzzleHttp\Client;
@@ -21,13 +21,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function Safe\json_encode;
 use function Safe\json_decode;
 
-class Brasil247ImportCommand extends ContainerAwareCommand
+class InsajderImportCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('newscoop:import-brasil247')
-            ->setDescription('Imports newscoop articles from brasil247 and save it to json.')
+            ->setName('newscoop:import-insajder')
+            ->setDescription('Imports newscoop articles from Insajder and save it to json.')
             ->setHelp('This command allows to import Newscoop articles with API usage and save them to predefined structure of html files')
             ->addArgument('domain', InputArgument::REQUIRED, 'Newscoop instance domain to fetch data from it.')
             ->addArgument('start', InputArgument::OPTIONAL, 'Number of article (start import from it).', null)
@@ -83,7 +83,7 @@ class Brasil247ImportCommand extends ContainerAwareCommand
                 'forceImageDownload' => true,
                 'importerClass' => NewscoopApiImporter::class,
                 'publisherClass' => NinjsPublisher::class,
-                'publisherFactoryClass' => Brasil247NinjsFactory::class,
+                'publisherFactoryClass' => InsajderNinjsFactory::class,
             ]));
             $processedArticle = new Article();
             $processedArticle->setNumber($article['number']);
@@ -115,7 +115,7 @@ class Brasil247ImportCommand extends ContainerAwareCommand
                     'forceImageDownload' => true,
                     'importerClass' => NewscoopApiImporter::class,
                     'publisherClass' => NinjsPublisher::class,
-                    'publisherFactoryClass' => Brasil247NinjsFactory::class,
+                    'publisherFactoryClass' => InsajderNinjsFactory::class,
                 ]));
                 ++$processedArticles;
                 $processedArticle = new Article();
