@@ -32,8 +32,8 @@ class InsajderNinjsFactory extends NinjsFactory
                     'code' => 'istrazivackeprice',
                 ],
                 25 => [
-                    'name' => '???',
-                    'code' => '???',
+                    'name' => 'Društvo',
+                    'code' => 'drustvo',
                 ],
                 26 => [
                     'name' => 'Podkast',
