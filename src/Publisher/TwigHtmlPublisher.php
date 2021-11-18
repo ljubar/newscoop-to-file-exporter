@@ -31,10 +31,10 @@ class TwigHtmlPublisher extends AbstractPublisher implements PublisherInterface
         $this->projectDir = $projectDir;
     }
 
-    public function publish(ContentInterface $article, $printRenderedTemplate = false): void
+    public function publish(ContentInterface $article, $printRenderedTemplate = false): ?string
     {
         if (!$article instanceof ArticleInterface) {
-            return;
+            return null;
         }
         $this->log(LogLevel::INFO, 'Rendering article '.$article->getIdentifier());
         $content = $this->twig->render('article.html.twig', ['article' => $article]);
@@ -49,5 +49,6 @@ class TwigHtmlPublisher extends AbstractPublisher implements PublisherInterface
         $path = $this->projectDir.'/public/articles/'.preg_replace('(^https?://)', '', implode('/', $urlParts));
 
         $this->saveContentToFile($fileName, $path, $content);
+        return $content;
     }
 }

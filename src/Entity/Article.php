@@ -5,7 +5,7 @@ namespace App\Entity;
 use AHS\Content\ArticleInterface;
 use AHS\Content\Content;
 use Symfony\Component\Serializer\Annotation\SerializedName;
-
+use AHS\Content\Image;
 use function Safe\strtotime;
 
 class Article extends Content implements ArticleInterface
@@ -15,19 +15,14 @@ class Article extends Content implements ArticleInterface
      */
     protected $id;
 
-    /**
-     * @var int
-     */
     protected $number;
 
     /**
-     * @var \DateTime
      * @SerializedName("created")
      */
     protected $createdAt;
 
     /**
-     * @var \DateTime
      * @SerializedName("published")
      */
     protected $publishedAt;
@@ -73,12 +68,12 @@ class Article extends Content implements ArticleInterface
     protected $language;
 
     /**
-     * @var string
+     * @var array
      */
     protected $issue;
 
     /**
-     * @var string
+     * @var array
      */
     protected $section;
 
@@ -127,13 +122,21 @@ class Article extends Content implements ArticleInterface
         return $this->number;
     }
 
-    public function setNumber($number)
+    public function setNumber($number = null): void
     {
         $this->number = $number;
     }
 
     public function getDescription(): ?string
     {
+$fields = $this->getFields();
+        switch ($this->getType()) {
+            case 'insajder':
+            case 'news':
+                return (null !== $fields['lead_article']) ? $fields['lead_article'] : '';
+        }
+
+        return '';
         return $this->description;
     }
 
@@ -142,14 +145,45 @@ class Article extends Content implements ArticleInterface
         $this->description = $description;
     }
 
-    public function getImage()
+    public function getImage(): ?Image
     {
+/*$articleImage = new Image();
+            $articleImage->setId($multimediaImage->getId());
+            $articleImage->setDescription($multimediaImage->getTitle());
+            $filepathParts = explode('/', $multimediaImage->getFilename());
+            $articleImage->setBasename($filepathParts[count($filepathParts) - 1]);
+            unset($filepathParts[count($filepathParts) - 1]);
+            $articleImage->setLocation(implode('/', $filepathParts));
+            $articleImage->setDomain($this->imagesLocation);
+            $articleImage->setPhotographer($multimediaImage->getAuthorString());
+            $articleImage->setWidth($multimediaImage->getWidth());
+            $articleImage->setHeight($multimediaImage->getHeight());
+
+            return $articleImage;
+*/
+return null;
         // TODO: Implement getImage() method.
     }
 
-    public function getImages(): array
+  public function getImages(): array
     {
-        return [];
+/*        $images = [];
+        foreach ($this->getRenditions() as $r) {
+            $image = new Image();
+            $image->setId(1);
+            $image->setDomain('https://insajder.net');
+            $image->setBasename(basename($r['link']));
+            $image->setDescription($r['details']['caption']);
+            $image->setPhotographer($r['details']['photographer']);
+            $image->setHeight((string)$r['details']['height']);
+            $image->setWidth((string)$r['details']['width']);
+        $image->setLocation('');    
+        $images[] =$image;
+        }
+
+        return $images;
+*/
+return [];
     }
 
     public function setImages(array $images = null)
@@ -176,9 +210,9 @@ class Article extends Content implements ArticleInterface
         $this->createdAt = $createdAt;
     }
 
-    public function getPublishedAt(): \DateTime
+    public function getPublishedAt()
     {
-        return $this->publishedAt;
+        return $this->publishedAt->format('Y-m-d h:i:s');;
     }
 
     public function setPublishedAt(string $publishedAt)
@@ -272,11 +306,20 @@ class Article extends Content implements ArticleInterface
         $this->renditions = $renditions;
     }
 
-    public function getRendition(string $caption): ?Rendition
+    public function getRendition(string $caption)
     {
         foreach ($this->getRenditions() as $rendition) {
-            if ($rendition->getCaption() === $caption) {
+            if ($rendition['caption'] === $caption) {
                 return $rendition;
+                $originalRendition = new Rendition();
+                $originalRendition->setCaption($rendition['caption']);
+                
+    //    $originalRendition->setMimetype('');
+   //     $originalRendition->setWidth((int) $rendition['width']);
+  //      $originalRendition->setHeight((int) $rendition['height']);
+//        $originalRendition->setMedia($rendition['basename']);
+//dump($originalRendition);die;
+                return $originalRendition;
             }
         }
 
@@ -293,7 +336,7 @@ class Article extends Content implements ArticleInterface
         $this->language = $language;
     }
 
-    public function getIssue(): string
+    public function getIssue()
     {
         return $this->issue;
     }
@@ -306,7 +349,7 @@ class Article extends Content implements ArticleInterface
         $this->issue = $issue;
     }
 
-    public function getSection(): string
+    public function getSection()
     {
         return $this->section;
     }
@@ -316,6 +359,19 @@ class Article extends Content implements ArticleInterface
         $this->section = $section;
     }
 
+        public function setExtra(array $extra): void
+{
+}
+
+    public function getExtra(): array
+{
+}
+
+    public function getCategories(): array {
+}
+
+    public function setCategories(array $categories) {
+}
     public function getBody(): string
     {
         if (null === $this->body) {

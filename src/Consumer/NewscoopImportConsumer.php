@@ -56,11 +56,10 @@ class NewscoopImportConsumer implements ConsumerInterface
         try {
             echo sprintf('Importing item: %s', $data['contentId'])."\n";
             $content = $importer->import($data['domain'], (int) $data['contentId'], $data['forceImageDownload']);
-
             if ($content instanceof ArticleInterface) {
                 // Check if it's in selected issue and sections
                 if ('newswire' !== $content->getType()) {
-                    echo sprintf('Publishing article from issue: %s and section: %s and type: %s', $content->getIssue(), $content->getSection(), $content->getType())."\n";
+                    //echo sprintf('Publishing article from issue: %s and section: %s and type: %s', $content->getIssue(), $content->getSection(), $content->getType())."\n";
                     $publisher->publish($content);
                 } else {
                     echo "Newswire is ignored \n";
@@ -75,7 +74,7 @@ class NewscoopImportConsumer implements ConsumerInterface
             }
         } catch (\Exception $e) {
             echo $e->getMessage()."\n";
-
+dump($e);die;
             return ConsumerInterface::MSG_REJECT;
         }
 

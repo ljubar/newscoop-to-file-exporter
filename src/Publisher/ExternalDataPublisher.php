@@ -28,10 +28,10 @@ use function Safe\json_encode;
 
 class ExternalDataPublisher extends AbstractPublisher implements PublisherInterface
 {
-    public function publish(ContentInterface $content, $printRenderedTemplate = false): void
+    public function publish(ContentInterface $content, $printRenderedTemplate = false): ?string
     {
         if (! $content instanceof ExternalDataInterface) {
-            return;
+            return null;
         }
 
         $data = $content->getExternalData();
@@ -50,5 +50,6 @@ class ExternalDataPublisher extends AbstractPublisher implements PublisherInterf
         } catch (GuzzleException $e) {
             dump($e);
         }
+return $body;
     }
 }

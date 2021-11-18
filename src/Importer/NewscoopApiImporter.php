@@ -29,15 +29,14 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
         $this->log(LogLevel::INFO, 'Fetching article '.$articleNumber);
         $response = $this->client->request('GET', $domain.'/api/articles/'.$articleNumber);
         $content = $response->getBody()->getContents();
-
-        // validate json
+// validate json
         json_decode($content);
-
         /** @var Article $article */
         $article = $this->serializer->deserialize($content, Article::class, 'json');
-        $text = $this->replaceRelativeUrlsWithAbsolute($domain, $article->getBody());
+        $text = $this->replaceRelativeUrlsWithAbsolute($domain, $article->getFields()['body'] ?? '');
         $text = $this->fetchAndReplaceBodyImages($text, $domain, $forceImageDownload);
         $article->setBody($text);
+
         $this->processRenditions($domain, $article, $forceImageDownload);
         $this->processArticleAuthors($article);
 

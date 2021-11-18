@@ -1,7 +1,7 @@
 doctrine:
     dbal:
-        driver:   pdo_sqlite
-        path:     "%kernel.root_dir%/test.db3"
+        driver:   pdo_pgsql
+        url:      pgsql://postgres@127.0.0.1/insajder-migration?charset=utf8&serverVersion=9
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore

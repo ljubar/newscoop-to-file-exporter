@@ -99,9 +99,10 @@ abstract class AbstractImporter
         $downloadedImages = [];
         /* @var Rendition $rendition */
         foreach ($article->getRenditions() as $rendition) {
-            $renditionDetails = $rendition->getDetails();
+            $renditionDetails = $rendition['details'];
             if (isset($renditionDetails['original']['src'])) {
                 $src = str_replace('%7C', '/', urldecode($renditionDetails['original']['src']));
+                $src = str_replace('%2F', '/', $src);
                 $filesystem = new Filesystem();
                 $urlParts = explode('/', str_replace('cache/', '', $src));
 
@@ -130,10 +131,11 @@ abstract class AbstractImporter
                     file_put_contents($path.'/'.$fileName, $response->getBody());
                     $this->log(LogLevel::INFO, sprintf('Saving file in path: %s', $path.'/'.$fileName));
                 }
-                $rendition->setLink('/articles/'.$filePath.'/'.$fileName);
+                $l = '/articles/'.$filePath.'/'.$fileName;
+                $rendition['link'] = $l;
                 $renditionDetails['original']['src'] = '/articles/'.$filePath.'/'.$fileName;
                 $renditionDetails['original']['external_src'] = $originalImageUrl;
-                $rendition->setDetails($renditionDetails);
+                $rendition['details'] = $renditionDetails;
             }
         }
     }

@@ -51,7 +51,7 @@ class InsajderImportCommand extends ContainerAwareCommand
                 $producer,
                 $logger,
                 $client,
-                $input->getArgument('domain').'/api/articles?items_per_page=600&fields=number&language=pt&sort[created]=desc',
+                $input->getArgument('domain').'/api/articles?items_per_page=600&fields=number&language=sr&sort[created]=desc',
                 $input->getArgument('domain'),
                 $start
             );
