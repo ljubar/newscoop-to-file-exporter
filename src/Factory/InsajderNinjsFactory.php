@@ -2,14 +2,17 @@
 declare(strict_types=1);
 
 namespace App\Factory;
-
+use AHS\Ninjs\Schema\Associations;
+use Hoa\Mime\Mime;
+use AHS\Ninjs\Schema\Renditions;
+use AHS\Ninjs\Superdesk\Item;
 use AHS\Factory\NinjsFactory;
 use AHS\Ninjs\Superdesk\Extra;
 use AHS\Ninjs\Superdesk\Service;
 use AHS\Content\ArticleInterface;
 use AHS\Ninjs\Superdesk\Item as SuperdeskItem;
 use AHS\Content\ContentInterface;
-
+use AHS\Ninjs\Superdesk\Rendition;
 class InsajderNinjsFactory extends NinjsFactory
 {
     const ISSUES = [
@@ -251,12 +254,100 @@ class InsajderNinjsFactory extends NinjsFactory
         return ['fullwidthfront', 'universal'];
     }
 
+public function createMedia(ArticleInterface $article): ?Item
+    {
+        $rendition = null;
+//dump($article->getRenditions());die;
+        foreach ($this->getRenditionNames() as $renditionName) {
+            if (0 === count($article->getRenditions())) {
+                break;
+            }
+            if (null !== $rendition = $article->getRendition($renditionName)) {
+                break;
+            }
+        }
+//dump($rendition);die;
+        if (null === $rendition) {
+            return null;
+        }
+
+        $imagePath = $rendition['link'];
+        $extension = pathinfo($imagePath, PATHINFO_EXTENSION);
+        $imageFileName = pathinfo($imagePath, PATHINFO_BASENAME);
+        //list($width, $height) = getimagesize($imagePath);
+
+
+    $externalUrl = 'https://'.$rendition['details']['original']['src'];
+
+        $imageItem = new Item($externalUrl);
+        $imageItem->setType('picture');
+        $imageItem->setHeadline($article->getTitle());
+        $caption = $rendition['caption'];
+        if ('' === $caption) {
+            $caption = $this->getDescription($article);
+        }
+        $imageItem->setDescriptionHtml($caption);
+        $imageItem->setDescriptionText(strip_tags($caption));
+        $imageItem->setVersion('1');
+        $this->setAuthor($article, $imageItem);
+        $imageItem->setUrgency(5);
+        $imageItem->setPriority(5);
+        $imageItem->setLanguage($article->getLanguage());
+        $imageItem->setUsageterms('indefinite-usage');
+        $imageItem->setPubstatus('usable');
+        $imageItem->setVersioncreated(new \DateTime($article->getPublishedAt()));
+        $renditions = new Renditions();
+        $originalRendition = new Rendition($externalUrl);
+        $originalRendition->setMimetype(Mime::getMimeFromExtension($extension));
+        $originalRendition->setWidth($rendition['details']['width']);
+        $originalRendition->setHeight($rendition['details']['height']);
+        $originalRendition->setMedia($imageFileName);
+        $renditions->add('original', $originalRendition);
+        $renditions->add('baseImage', $originalRendition);
+
+        $imageItem->setRenditions($renditions);
+        return $imageItem;
+    }
+
+    public function create(ArticleInterface $article): Item
+    {
+        $item = parent::create($article);
+        //dump($item);die;
+$featureMedia = $this->createMedia($article);
+dump('sss', $featureMedia);
+        if (null !== $featureMedia) {
+            $associations = new Associations();
+            $associations->add('featuremedia', $this->createMedia($article));
+            $item->setAssociations($associations);
+        }
+
+        return $item;
+
+        $associations = $item->getAssociations();
+//dump($associations);die;
+        if (null !== $article->getImage()) {
+            $featuredImage = $this->createImageItem(
+                $this->createArticleImageFromMultimedia($article->getImage()->getId())
+            );
+            if (null !== $featuredImage) {
+                $associations->add('featuremedia', $featuredImage);
+            }
+        }
+
+if (0 === \count($associations->getItems())) {
+            $item->setAssociations(null);
+        }
+
+        return $item;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getDescription(ArticleInterface $article): string
     {
         $fields = $article->getFields();
+
         switch ($article->getType()) {
             case 'insajder':
             case 'news':
@@ -274,33 +365,7 @@ class InsajderNinjsFactory extends NinjsFactory
         $extra = new Extra();
         if ('news' === $article->getType()) {
             $extra->add('feature_video', $article->getFields()['youtube_shortcode']);
-            if ($article->getFields()['text_item']) {
-                $extra->add('itemtype', 'text_item');
-            }
-            if ($article->getFields()['photo_item']) {
-                $extra->add('itemtype', 'photo_item');
-            }
-            if ($article->getFields()['episode_item']) {
-                $extra->add('itemtype', 'episode_item');
-            }
-            if ($article->getFields()['phonecall_item']) {
-                $extra->add('itemtype', 'phonecall_item');
-            }
-            if ($article->getFields()['conference_item']) {
-                $extra->add('itemtype', 'conference_item');
-            }
-            if ($article->getFields()['video_item']) {
-                $extra->add('itemtype', 'video_item');
-            }
-            if ($article->getFields()['attachment_item']) {
-                $extra->add('itemtype', 'attachment_item');
-            }
-            if ($article->getFields()['results_item']) {
-                $extra->add('itemtype', 'results_item');
-            }
-            if ($article->getFields()['epilog_item']) {
-                $extra->add('itemtype', 'epilog_item');
-            }
+        }
         $extra->add('original_publish_date', $item->getVersioncreated());
         $item->setExtra($extra);
     }
@@ -321,8 +386,10 @@ class InsajderNinjsFactory extends NinjsFactory
 
         /* Above we need 'if article type "insajder", assign content profile 'format' */
 
-        $issueNumber = $article->getIssue();
-        $sectionNumber = $article->getSection();
+        //$issueNumber = $article->getIssue();
+        //$sectionNumber = $article->getSection();
+                $issueNumber = (string) $article->getIssue()['number'];
+        $sectionNumber = (string) $article->getSection()['number'];
         $category = null;
         $code = null;
 
