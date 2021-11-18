@@ -277,7 +277,7 @@ public function createMedia(ArticleInterface $article): ?Item
         //list($width, $height) = getimagesize($imagePath);
 
 
-    $externalUrl = 'https://'.$rendition['details']['original']['src'];
+    $externalUrl = urldecode('https://'.$rendition['details']['original']['src']);
 
         $imageItem = new Item($externalUrl);
         $imageItem->setType('picture');
@@ -314,7 +314,7 @@ public function createMedia(ArticleInterface $article): ?Item
         $item = parent::create($article);
         //dump($item);die;
 $featureMedia = $this->createMedia($article);
-dump('sss', $featureMedia);
+//dump('sss', $featureMedia);
         if (null !== $featureMedia) {
             $associations = new Associations();
             $associations->add('featuremedia', $this->createMedia($article));
@@ -365,8 +365,36 @@ if (0 === \count($associations->getItems())) {
         $extra = new Extra();
         if ('news' === $article->getType()) {
             $extra->add('feature_video', $article->getFields()['youtube_shortcode']);
-        }
-        $extra->add('original_publish_date', $item->getVersioncreated());
+        
+                   if (isset($article->getFields()['text_item'])) {
+                $extra->add('itemtype', 'text_item');
+            }
+            if (isset($article->getFields()['photo_item'])) {
+                $extra->add('itemtype', 'photo_item');
+            }
+            if (isset($article->getFields()['episode_item'])) {
+                $extra->add('itemtype', 'episode_item');
+            }
+            if (isset($article->getFields()['phonecall_item'])) {
+                $extra->add('itemtype', 'phonecall_item');
+            }
+            if (isset($article->getFields()['conference_item'])) {
+                $extra->add('itemtype', 'conference_item');
+            }
+            if (isset($article->getFields()['video_item'])) {
+                $extra->add('itemtype', 'video_item');
+            }
+            if (isset($article->getFields()['attachment_item'])) {
+                $extra->add('itemtype', 'attachment_item');
+            }
+            if (isset($article->getFields()['results_item'])) {
+                $extra->add('itemtype', 'results_item');
+            }
+            if (isset($article->getFields()['epilog_item'])) {
+                $extra->add('itemtype', 'epilog_item');
+            }
+}
+$extra->add('original_publish_date', $item->getVersioncreated());
         $item->setExtra($extra);
     }
 
