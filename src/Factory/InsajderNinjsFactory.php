@@ -364,9 +364,10 @@ if (0 === \count($associations->getItems())) {
     {
         $extra = new Extra();
         if ('news' === $article->getType()) {
-            $extra->add('feature_video', $article->getFields()['youtube_shortcode']);
-        
-                   if (isset($article->getFields()['text_item'])) {
+            if (isset($article->getFields()['youtube_shortcode'])) {
+            	$extra->add('feature_video', $article->getFields()['youtube_shortcode']);
+            }
+            if (isset($article->getFields()['text_item'])) {
                 $extra->add('itemtype', 'text_item');
             }
             if (isset($article->getFields()['photo_item'])) {
@@ -393,7 +394,10 @@ if (0 === \count($associations->getItems())) {
             if (isset($article->getFields()['epilog_item'])) {
                 $extra->add('itemtype', 'epilog_item');
             }
-}
+        }
+        if ('insajder' === $article->getType()) {
+            $extra->add('itemtype', 'wrapper_item');
+        }        
 $extra->add('original_publish_date', $item->getVersioncreated());
         $item->setExtra($extra);
     }
