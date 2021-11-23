@@ -282,10 +282,8 @@ public function createMedia(ArticleInterface $article): ?Item
         $imageItem = new Item($externalUrl);
         $imageItem->setType('picture');
         $imageItem->setHeadline($article->getTitle());
-        $caption = $rendition['caption'];
-        if ('' === $caption) {
-            $caption = $this->getDescription($article);
-        }
+        $caption = $rendition['details']['caption'];
+
         $imageItem->setDescriptionHtml($caption);
         $imageItem->setDescriptionText(strip_tags($caption));
         $imageItem->setVersion('1');
@@ -312,30 +310,11 @@ public function createMedia(ArticleInterface $article): ?Item
     public function create(ArticleInterface $article): Item
     {
         $item = parent::create($article);
-        //dump($item);die;
-$featureMedia = $this->createMedia($article);
-//dump('sss', $featureMedia);
+        $featureMedia = $this->createMedia($article);
         if (null !== $featureMedia) {
             $associations = new Associations();
             $associations->add('featuremedia', $this->createMedia($article));
             $item->setAssociations($associations);
-        }
-
-        return $item;
-
-        $associations = $item->getAssociations();
-//dump($associations);die;
-        if (null !== $article->getImage()) {
-            $featuredImage = $this->createImageItem(
-                $this->createArticleImageFromMultimedia($article->getImage()->getId())
-            );
-            if (null !== $featuredImage) {
-                $associations->add('featuremedia', $featuredImage);
-            }
-        }
-
-if (0 === \count($associations->getItems())) {
-            $item->setAssociations(null);
         }
 
         return $item;
