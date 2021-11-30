@@ -349,28 +349,28 @@ public function createMedia(ArticleInterface $article): ?Item
             if (isset($article->getFields()['text_item'])) {
                 $extra->add('itemtype', 'text_item');
             }
-            if (isset($article->getFields()['photo_item'])) {
+            if (isset($article->getFields()['photo_item']) && $article->getFields()['photo_item'] === '1') {
                 $extra->add('itemtype', 'photo_item');
             }
-            if (isset($article->getFields()['episode_item'])) {
+            if (isset($article->getFields()['episode_item']) && $article->getFields()['episode_item'] === '1') {
                 $extra->add('itemtype', 'episode_item');
             }
-            if (isset($article->getFields()['phonecall_item'])) {
+            if (isset($article->getFields()['phonecall_item']) && $article->getFields()['phonecall_item'] === '1') {
                 $extra->add('itemtype', 'phonecall_item');
             }
-            if (isset($article->getFields()['conference_item'])) {
+            if (isset($article->getFields()['conference_item']) && $article->getFields()['conference_item'] === '1') {
                 $extra->add('itemtype', 'conference_item');
             }
-            if (isset($article->getFields()['video_item'])) {
+            if (isset($article->getFields()['video_item']) && $article->getFields()['video_item'] === '1') {
                 $extra->add('itemtype', 'video_item');
             }
-            if (isset($article->getFields()['attachment_item'])) {
+            if (isset($article->getFields()['attachment_item']) && $article->getFields()['attachment_item'] === '1') {
                 $extra->add('itemtype', 'attachment_item');
             }
-            if (isset($article->getFields()['results_item'])) {
+            if (isset($article->getFields()['results_item']) && $article->getFields()['results_item'] === '1') {
                 $extra->add('itemtype', 'results_item');
             }
-            if (isset($article->getFields()['epilog_item'])) {
+            if (isset($article->getFields()['epilog_item']) && $article->getFields()['epilog_item'] === '1') {
                 $extra->add('itemtype', 'epilog_item');
             }
         }
