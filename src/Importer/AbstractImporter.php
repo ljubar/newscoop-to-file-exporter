@@ -88,7 +88,7 @@ abstract class AbstractImporter
                 $this->log(LogLevel::INFO, sprintf('Downloading body image from path: %s', $originalImageUrl));
                 file_put_contents($path.'/'.$fileName, $response->getBody());
             }
-            $img->setAttribute('src', '/'.$filePath.'/'.$fileName);
+            $img->setAttribute('src', 'https://'.$filePath.'/'.$fileName);
         }
 
         return $dom->saveHTML($dom->documentElement);

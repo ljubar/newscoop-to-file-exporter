@@ -133,7 +133,7 @@ $fields = $this->getFields();
         switch ($this->getType()) {
             case 'insajder':
             case 'news':
-                return (null !== $fields['lead_article']) ? $fields['lead_article'] : '';
+                return $fields['lead_article'] ?? '';
         }
 
         return '';
@@ -275,7 +275,7 @@ return [];
         }
 
         if (array_key_exists('text', $fields)) {
-            $this->setBody($fields['text']);
+            $this->setBody($fields['text'] ?? '');
         }
 
         $this->fields = $fields;

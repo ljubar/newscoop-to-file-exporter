@@ -74,7 +74,6 @@ class NewscoopImportConsumer implements ConsumerInterface
             }
         } catch (\Exception $e) {
             echo $e->getMessage()."\n";
-dump($e);die;
             return ConsumerInterface::MSG_REJECT;
         }
 
