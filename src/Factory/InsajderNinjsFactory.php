@@ -296,7 +296,7 @@ public function createMedia(ArticleInterface $article): ?Item
         $imageItem->setVersioncreated(new \DateTime($article->getPublishedAt()));
         $renditions = new Renditions();
         $originalRendition = new Rendition($externalUrl);
-        $originalRendition->setMimetype(Mime::getMimeFromExtension($extension));
+        $originalRendition->setMimetype(Mime::getMimeFromExtension($extension) ?? '');
         $originalRendition->setWidth($rendition['details']['width']);
         $originalRendition->setHeight($rendition['details']['height']);
         $originalRendition->setMedia($imageFileName);
@@ -377,7 +377,8 @@ public function createMedia(ArticleInterface $article): ?Item
         if ('insajder' === $article->getType()) {
             $extra->add('itemtype', 'wrapper_item');
         }        
-$extra->add('original_publish_date', $item->getVersioncreated());
+$extra->add('original_published_at', $item->getVersioncreated());
+$extra->add('original_article_url', $item->getGuid());
         $item->setExtra($extra);
     }
 
