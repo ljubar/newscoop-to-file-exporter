@@ -26,18 +26,6 @@ class InsajderNinjsFactory extends NinjsFactory
                     'name' => 'News',
                     'code' => 'news',
                 ],
-                17 => [
-                    'name' => 'Positive stories',
-                    'code' => 'positive',
-                ],
-                30 => [
-                    'name' => 'We recommend',
-                    'code' => 'recommended',
-                ],
-                50 => [
-                    'name' => 'About Insajder',
-                    'code' => 'about',
-                ],
                 99 => [
                     'name' => 'Insajder without limits',
                     'code' => 'bezogranicenja',
@@ -69,23 +57,7 @@ class InsajderNinjsFactory extends NinjsFactory
                 405 => [
                     'name' => 'prodajaeng',
                     'code' => 'prodaja',
-                ],
-                510 => [
-                    'name' => 'Elections 2016',
-                    'code' => '510',
-                ],
-                520 => [
-                    'name' => 'Refugees on horror route',
-                    'code' => 'refugees',
-                ],                
-                530 => [
-                    'name' => 'Media: War for truth',
-                    'code' => 'mediawar',
-                ],
-                540 => [
-                    'name' => 'DIPOS, squanderer of state money',
-                    'code' => 'DIPOS',
-                ],
+                ]
             ],
         ],
     ];
