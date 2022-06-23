@@ -19,47 +19,107 @@ class InsajderNinjsFactory extends NinjsFactory
         10 => [        
             'sections' => [
                 10 => [
-                    'name' => 'In Focus',
-                    'code' => 'focus',
+                    'name' => 'Valjevo',
+                    'code' => 'valjevo',
                 ],
-                15 => [
-                    'name' => 'News',
-                    'code' => 'news',
+                20 => [
+                    'name' => 'Okrug',
+                    'code' => 'okrug',
                 ],
-                99 => [
-                    'name' => 'Insajder without limits',
-                    'code' => 'bezogranicenja',
+                30 => [
+                    'name' => 'Privreda',
+                    'code' => 'privreda',
                 ],
-                110 => [
-                    'name' => 'Službena (zlo)upotreba',
-                    'code' => 'sluzbena',
+                40 => [
+                    'name' => 'Sport',
+                    'code' => 'sport',
                 ],
-                150 => [
-                    'name' => 'Prevara veka',
-                    'code' => 'prevaraveka',
+                50 => [
+                    'name' => 'Kultura',
+                    'code' => 'kultura',
                 ],
-                170 => [
-                    'name' => 'Službena tajna',
-                    'code' => 'sluzbenatajna',
+                60 => [
+                    'name' => 'Život',
+                    'code' => 'zivot',
                 ],
-                190 => [
-                    'name' => 'Pravila igre',
-                    'code' => 'pravilaigre',
+                70 => [
+                    'name' => 'Mi bismo to ovako',
+                    'code' => 'mbto',
                 ],
-                222 => [
-                    'name' => 'Full stop',
-                    'code' => 'tacka',
+                71 => [
+                    'name' => 'Izbori 2016',
+                    'code' => 'izbori2016',
                 ],
-                230 => [
-                    'name' => '(Ne)moć države',
-                    'code' => 'nemocdrzave',
-                ],
-                405 => [
-                    'name' => 'prodajaeng',
-                    'code' => 'prodaja',
+                80 => [
+                    'name' => 'Dijalog',
+                    'code' => 'dijalog',
                 ]
             ],
         ],
+        3 => [        
+            'sections' => [
+                31 => [
+                    'name' => 'Iz redakcije',
+                    'code' => 'izredakcije',
+                ],
+                35 => [
+                    'name' => '3put odjedanput',
+                    'code' => '3put',
+                ],
+                36 => [
+                    'name' => 'Zvezdano nebo nad nama...',
+                    'code' => 'zvezdano',
+                ],
+                37 => [
+                    'name' => 'Iza kulisa',
+                    'code' => 'izakulisa',
+                ],
+                38 => [
+                    'name' => 'Bez kraja',
+                    'code' => 'bezkraja',
+                ],
+                39 => [
+                    'name' => 'Nije sve u Valjevu cirkus',
+                    'code' => 'cirkus',
+                ],
+                40 => [
+                    'name' => 'Shit happens',
+                    'code' => 'shithappens',
+                ],
+                41 => [
+                    'name' => 'Valjevo Holivud via Bolivud',
+                    'code' => 'holivud',
+                ],
+                42 => [
+                    'name' => 'Ladan oblog',
+                    'code' => 'oblog',
+                ],
+                43 => [
+                    'name' => 'Zlatno doba',
+                    'code' => 'zlatnodoba',
+                ],
+                44 => [
+                    'name' => 'Trupni portret',
+                    'code' => 'trupniportret',
+                ],
+                200 => [
+                    'name' => 'Ars Vivendi',
+                    'code' => 'arsvivendi',
+                ],
+                210 => [
+                    'name' => 'Impuls grada',
+                    'code' => 'impulsgrada',
+                ],
+                215 => [
+                    'name' => 'FotoGrad',
+                    'code' => 'FotoGrad',
+                ],
+                220 => [
+                    'name' => 'Redakcijski foto-blog',
+                    'code' => 'djdj',
+                ]
+            ]
+        ],        
     ];
 
     /**
@@ -67,7 +127,7 @@ class InsajderNinjsFactory extends NinjsFactory
      */
     public function getRenditionNames(): array
     {
-        return ['fullwidthfront', 'universal'];
+        return ['article'];
     }
 
 public function createMedia(ArticleInterface $article): ?Item
@@ -144,9 +204,13 @@ public function createMedia(ArticleInterface $article): ?Item
         $fields = $article->getFields();
 
         switch ($article->getType()) {
-            case 'insajder':
+            case 'bloginfo':
+            case 'link':
+            case 'dossier':
+            case 'poll':   
             case 'news':
-                return (null !== $fields['lead_article']) ? $fields['lead_article'] : '';
+            case 'blogpost':                
+                return (null !== $fields['deck ']) ? $fields['deck '] : '';
         }
 
         return '';
@@ -158,43 +222,8 @@ public function createMedia(ArticleInterface $article): ?Item
     public function setExtra(ArticleInterface $article, SuperdeskItem $item, $extra = null): void
     {
         $extra = new Extra();
-        if ('news' === $article->getType()) {
-            if (isset($article->getFields()['youtube_shortcode'])) {
-            	$extra->add('feature_video', $article->getFields()['youtube_shortcode']);
-            }
-            if (isset($article->getFields()['text_item'])) {
-                $extra->add('itemtype', 'text_item');
-            }
-            if (isset($article->getFields()['photo_item']) && $article->getFields()['photo_item'] === '1') {
-                $extra->add('itemtype', 'photo_item');
-            }
-            if (isset($article->getFields()['episode_item']) && $article->getFields()['episode_item'] === '1') {
-                $extra->add('itemtype', 'episode_item');
-            }
-            if (isset($article->getFields()['phonecall_item']) && $article->getFields()['phonecall_item'] === '1') {
-                $extra->add('itemtype', 'phonecall_item');
-            }
-            if (isset($article->getFields()['conference_item']) && $article->getFields()['conference_item'] === '1') {
-                $extra->add('itemtype', 'conference_item');
-            }
-            if (isset($article->getFields()['video_item']) && $article->getFields()['video_item'] === '1') {
-                $extra->add('itemtype', 'video_item');
-            }
-            if (isset($article->getFields()['attachment_item']) && $article->getFields()['attachment_item'] === '1') {
-                $extra->add('itemtype', 'attachment_item');
-            }
-            if (isset($article->getFields()['results_item']) && $article->getFields()['results_item'] === '1') {
-                $extra->add('itemtype', 'results_item');
-            }
-            if (isset($article->getFields()['epilog_item']) && $article->getFields()['epilog_item'] === '1') {
-                $extra->add('itemtype', 'epilog_item');
-            }
-        }
-        if ('insajder' === $article->getType()) {
-            $extra->add('itemtype', 'wrapper_item');
-        }        
-$extra->add('original_published_at', $item->getVersioncreated());
-$extra->add('original_article_url', $item->getGuid());
+        $extra->add('original_published_at', $item->getVersioncreated());
+        $extra->add('original_article_url', $item->getGuid());
         $item->setExtra($extra);
     }
 
@@ -206,17 +235,8 @@ $extra->add('original_article_url', $item->getGuid());
      */
     public function setCategory(ArticleInterface $article, SuperdeskItem $item): void
     {
-        // if ('revista' === $article->getType()) {
-        //     $item->addService(new Service('Revista Oasis', 'revO'));
 
-        //     return;
-        // }
-
-        /* Above we need 'if article type "insajder", assign content profile 'format' */
-
-        //$issueNumber = $article->getIssue();
-        //$sectionNumber = $article->getSection();
-                $issueNumber = (string) $article->getIssue()['number'];
+        $issueNumber = (string) $article->getIssue()['number'];
         $sectionNumber = (string) $article->getSection()['number'];
         $category = null;
         $code = null;
@@ -249,7 +269,7 @@ $extra->add('original_article_url', $item->getGuid());
             return false;
         }
 
-        $array = ['Newswire', 'page', 'video'];
+        $array = ['link', 'bloginfo', 'dossier', 'like_today', 'page', 'poll'];
 
         if (in_array($content->getType(), $array)) {
             return false;
