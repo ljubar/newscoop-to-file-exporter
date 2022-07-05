@@ -101,7 +101,6 @@ class InsajderNinjsFactory extends NinjsFactory
 public function createMedia(ArticleInterface $article): ?Item
     {
         $rendition = null;
-//dump($article->getRenditions());die;
         foreach ($this->getRenditionNames() as $renditionName) {
             if (0 === count($article->getRenditions())) {
                 break;
@@ -121,7 +120,7 @@ public function createMedia(ArticleInterface $article): ?Item
         //list($width, $height) = getimagesize($imagePath);
 
 
-    $externalUrl = urldecode('https://'.$rendition['details']['original']['src']);
+    $externalUrl = urldecode('http://'.$rendition['details']['original']['src']);
 
         $imageItem = new Item($externalUrl);
         $imageItem->setType('picture');
@@ -155,12 +154,13 @@ public function createMedia(ArticleInterface $article): ?Item
     {
         $item = parent::create($article);
         $featureMedia = $this->createMedia($article);
+//dump('ffffffffff',$featureMedia);
         if (null !== $featureMedia) {
             $associations = new Associations();
             $associations->add('featuremedia', $this->createMedia($article));
             $item->setAssociations($associations);
         }
-
+dump('ssss',$item->getAssociations());
         return $item;
     }
 
