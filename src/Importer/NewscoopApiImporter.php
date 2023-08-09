@@ -27,7 +27,7 @@ class NewscoopApiImporter extends AbstractImporter implements ImporterInterface
     public function import(string $domain, int $articleNumber, bool $forceImageDownload = false): ContentInterface
     {
         $this->log(LogLevel::INFO, 'Fetching article '.$articleNumber);
-        $response = $this->client->request('GET', $domain.'/api/articles/'.$articleNumber);
+        $response = $this->client->request('GET', $domain.'/api/articles/'.$articleNumber.'?language=en');
         $content = $response->getBody()->getContents();
 // validate json
         json_decode($content);

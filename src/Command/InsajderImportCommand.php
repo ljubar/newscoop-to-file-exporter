@@ -51,7 +51,7 @@ class InsajderImportCommand extends ContainerAwareCommand
                 $producer,
                 $logger,
                 $client,
-                $input->getArgument('domain').'/api/articles?items_per_page=600&fields=number&language=sr&sort[created]=desc',
+                $input->getArgument('domain').'/api/articles?items_per_page=600&fields=number&language=en&sort[created]=desc',
                 $input->getArgument('domain'),
                 $start
             );
@@ -99,11 +99,12 @@ class InsajderImportCommand extends ContainerAwareCommand
         $articles = $this->getArticles($logger, $client, $url);
         $processedArticles = 0;
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        foreach ($articles['items'] as $article) {
-            if (null !== $start && $article['number'] > $start) {
+$arts = [689,773,575,566,4189,650,506,3566,3541,569,4483,574,799];
+        foreach ($arts as $article) {
+            if (null !== $start && $article > $start) {
                 continue;
             }
-            $processedArticle = $em->getRepository(Article::class)->findOneBy(['number' => $article['number']]);
+            $processedArticle = $em->getRepository(Article::class)->findOneBy(['number' => $article]);
             if ($processedArticle) {
                 continue;
             }
@@ -111,7 +112,7 @@ class InsajderImportCommand extends ContainerAwareCommand
             try {
                 $producer->publish(json_encode([
                     'domain' => $domain,
-                    'contentId' => $article['number'],
+                    'contentId' => $article,
                     'forceImageDownload' => true,
                     'importerClass' => NewscoopApiImporter::class,
                     'publisherClass' => NinjsPublisher::class,
@@ -119,7 +120,7 @@ class InsajderImportCommand extends ContainerAwareCommand
                 ]));
                 ++$processedArticles;
                 $processedArticle = new Article();
-                $processedArticle->setNumber($article['number']);
+                $processedArticle->setNumber($article);
                 $em->persist($processedArticle);
             } catch (\Exception $e) {
                 $logger->log(LogLevel::ERROR, $e->getMessage());

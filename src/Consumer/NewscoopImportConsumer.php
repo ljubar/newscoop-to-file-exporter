@@ -56,6 +56,10 @@ class NewscoopImportConsumer implements ConsumerInterface
         try {
             echo sprintf('Importing item: %s', $data['contentId'])."\n";
             $content = $importer->import($data['domain'], (int) $data['contentId'], $data['forceImageDownload']);
+if ($content->getSection()['number'] === 170) {
+echo 'section 170 skipped';
+return ConsumerInterface::MSG_ACK;
+}
             if ($content instanceof ArticleInterface) {
                 // Check if it's in selected issue and sections
                 if ('newswire' !== $content->getType()) {
